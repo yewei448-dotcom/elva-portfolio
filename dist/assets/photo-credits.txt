@@ -1,0 +1,9 @@
+Decorative hero and footer background, not a personal photograph by Ye Wei.
+Title: Green hill under a blue sky with clouds
+Photographer: Adrien Olichon (@adrienolichon)
+Source: https://unsplash.com/photos/green-hill-under-a-blue-sky-with-clouds-yOkNxeFoh-s
+Image: https://images.unsplash.com/photo-1762766040661-46fe35939255?auto=format&fit=crop&fm=jpg&q=85&w=2400
+License: Unsplash License, source page explicitly marks it free to use.
+License URL: https://unsplash.com/license
+Downloaded: 2026-11-13
+Local file: dist/assets/meadow.jpg

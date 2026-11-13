@@ -50,105 +50,94 @@ const projectNotes = {
 };
 
 const menuButton = document.querySelector('.menu-toggle');
-const navigation = document.querySelector('#navigation');
+const mobileMenu = document.querySelector('#mobile-menu');
 function closeMenu() {
-  navigation.classList.remove('open');
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.setAttribute('aria-label', '打开导航');
+  mobileMenu.hidden = true;
+  menuButton.setAttribute('aria-expanded','false');
+  menuButton.setAttribute('aria-label','打开菜单');
 }
 menuButton.addEventListener('click', () => {
   const open = menuButton.getAttribute('aria-expanded') !== 'true';
-  navigation.classList.toggle('open', open);
-  menuButton.setAttribute('aria-expanded', String(open));
-  menuButton.setAttribute('aria-label', open ? '关闭导航' : '打开导航');
+  mobileMenu.hidden = !open;
+  menuButton.setAttribute('aria-expanded',String(open));
+  menuButton.setAttribute('aria-label',open ? '关闭菜单' : '打开菜单');
 });
-navigation.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();});
 
-document.querySelectorAll('[data-filter]').forEach(button => {
-  button.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter]').forEach(filter => {
-      const active = filter === button;
-      filter.classList.toggle('active', active);
-      filter.setAttribute('aria-pressed', String(active));
-    });
-    document.querySelectorAll('.project-card').forEach(project => {
-      project.hidden = button.dataset.filter !== 'all' && project.dataset.category !== button.dataset.filter;
-    });
-  });
-});
-
-const dialog = document.querySelector('#case-dialog');
-const content = document.querySelector('#case-content');
-function element(tag, className, text) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (text) node.textContent = text;
+function element(tag,className,text) {
+  const node=document.createElement(tag);
+  if(className)node.className=className;
+  if(text)node.textContent=text;
   return node;
 }
-document.querySelectorAll('[data-project]').forEach(button => {
-  button.addEventListener('click', () => {
-    const project = projectNotes[button.dataset.project];
-    content.replaceChildren();
-    content.append(element('p', 'case-eyebrow', project.category));
-    const title = element('h2', '', project.title);
-    title.id = 'case-title';
-    content.append(title, element('p', 'case-intro', project.intro));
-    const metrics = element('div', 'case-metrics');
-    project.metrics.forEach(([value, label]) => {
-      const metric = element('div');
-      metric.append(element('strong', '', value), element('span', '', label));
-      metrics.append(metric);
-    });
-    content.append(metrics);
-    project.sections.forEach(([heading, body]) => {
-      const section = element('section', 'case-section');
-      section.append(element('h3', '', heading));
-      if (Array.isArray(body)) {
-        const list = element('ul');
-        body.forEach(item => list.append(element('li', '', item)));
-        section.append(list);
-      } else section.append(element('p', '', body));
-      content.append(section);
-    });
-    const flow = element('div', 'case-flow');
-    flow.setAttribute('aria-label', '项目流程');
-    project.flow.forEach((step, index) => {
-      if (index) { const arrow = element('i', '', '→'); arrow.setAttribute('aria-hidden', 'true'); flow.append(arrow); }
-      flow.append(element('span', '', step));
-    });
-    content.append(flow);
-    dialog.showModal();
-    dialog.scrollTop = 0;
-    document.body.style.overflow = 'hidden';
+const dialog=document.querySelector('#case-dialog');
+const caseContent=document.querySelector('#case-content');
+document.querySelectorAll('[data-project]').forEach(button=>button.addEventListener('click',()=>{
+  const project=projectNotes[button.dataset.project];
+  caseContent.replaceChildren(element('p','case-eyebrow',project.category));
+  const title=element('h2','',project.title);title.id='case-title';
+  caseContent.append(title,element('p','case-intro',project.intro));
+  const metrics=element('div','case-metrics');
+  project.metrics.forEach(([value,label])=>{const metric=element('div');metric.append(element('strong','',value),element('span','',label));metrics.append(metric);});
+  caseContent.append(metrics);
+  project.sections.forEach(([heading,body])=>{
+    const section=element('section','case-section');section.append(element('h3','',heading));
+    if(Array.isArray(body)){const list=element('ul');body.forEach(text=>list.append(element('li','',text)));section.append(list);}
+    else section.append(element('p','',body));
+    caseContent.append(section);
   });
+  const flow=element('div','case-flow');flow.setAttribute('aria-label','项目流程');
+  project.flow.forEach((step,index)=>{if(index){const arrow=element('i','','→');arrow.setAttribute('aria-hidden','true');flow.append(arrow);}flow.append(element('span','',step));});
+  caseContent.append(flow);
+  dialog.showModal();dialog.scrollTop=0;lockPage();
+}));
+function lockPage(){document.body.classList.add('modal-open');document.body.style.overflow='hidden';}
+function unlockPage(){document.body.classList.remove('modal-open');document.body.style.overflow='';}
+document.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
+document.querySelector('.dialog-done').addEventListener('click',()=>dialog.close());
+dialog.addEventListener('close',unlockPage);
+function closeOnBackdrop(event){
+  if(event.target!==event.currentTarget)return;
+  const r=event.currentTarget.getBoundingClientRect();
+  if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)event.currentTarget.close();
+}
+dialog.addEventListener('click',closeOnBackdrop);
+
+const photoDialog=document.querySelector('#photo-dialog');
+const photoWall=document.querySelector('#photo-wall');
+const photos=window.siteContent?.photos??[];
+photos.forEach((photo,index)=>{
+  const card=element('figure',`photo-card ${photo.shape||'portrait'}`);
+  const slot=element(photo.src?'button':'div',`photo-slot${photo.src?' has-photo':''}`);
+  if(photo.src){
+    const image=element('img');image.src=photo.src;image.alt=photo.caption||`照片 ${index+1}`;image.loading='lazy';slot.append(image);
+    slot.setAttribute('aria-label',`放大查看：${image.alt}`);
+    slot.addEventListener('click',()=>{const img=document.querySelector('#photo-dialog-img');img.src=photo.src;img.alt=image.alt;document.querySelector('#photo-dialog-caption').textContent=photo.caption||'';photoDialog.showModal();lockPage();});
+  } else {
+    const placeholder=element('div','photo-placeholder');
+    const plus=element('span','photo-plus','＋');plus.setAttribute('aria-hidden','true');
+    placeholder.append(plus,element('span','',`PHOTO ${String(index+1).padStart(2,'0')}`),element('small','','待放入照片'));slot.append(placeholder);
+  }
+  card.append(slot,element('figcaption','photo-card-caption',photo.caption||`照片 ${index+1}`));
+  photoWall.append(card);
 });
-function closeDialog() { dialog.close(); }
-document.querySelector('.dialog-close').addEventListener('click', closeDialog);
-document.querySelector('.dialog-done').addEventListener('click', closeDialog);
-dialog.addEventListener('close', () => { document.body.style.overflow = ''; });
-dialog.addEventListener('click', event => {
-  if (event.target !== dialog) return;
-  const rect = dialog.getBoundingClientRect();
-  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeDialog();
-});
+document.querySelector('.photo-close').addEventListener('click',()=>photoDialog.close());
+photoDialog.addEventListener('close',unlockPage);photoDialog.addEventListener('click',closeOnBackdrop);
 
 let toastTimer;
-function showToast(message) {
-  const toast = document.querySelector('#toast');
-  clearTimeout(toastTimer);
-  toast.textContent = message;
-  toast.classList.add('visible');
-  toastTimer = setTimeout(() => toast.classList.remove('visible'), 3500);
+function showToast(message){const toast=document.querySelector('#toast');clearTimeout(toastTimer);toast.textContent=message;toast.classList.add('visible');toastTimer=setTimeout(()=>toast.classList.remove('visible'),3500);}
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(button.dataset.copy);showToast(`${button.dataset.copyLabel}已复制：${button.dataset.copy}`);}catch{showToast(`请手动复制${button.dataset.copyLabel}：${button.dataset.copy}`);}}));
+
+// 悬挂名片可轻轻拨动；触屏仍保留自然的页面滚动。
+const portrait=document.querySelector('#portrait-card');
+if(matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+  let pointerStart=null;
+  portrait.addEventListener('pointerdown',event=>{if(event.button!==0)return;pointerStart=event.clientX;portrait.setPointerCapture(event.pointerId);portrait.classList.add('dragging');event.preventDefault();});
+  portrait.addEventListener('pointermove',event=>{if(pointerStart===null)return;const angle=Math.max(-22,Math.min(18,-8+(event.clientX-pointerStart)/12));portrait.style.setProperty('--badge-angle',`${angle}deg`);});
+  const release=()=>{if(pointerStart===null)return;pointerStart=null;portrait.classList.remove('dragging');portrait.style.setProperty('--badge-angle','-8deg');};
+  portrait.addEventListener('pointerup',release);portrait.addEventListener('pointercancel',release);
 }
-document.querySelectorAll('[data-copy]').forEach(button => {
-  button.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(button.dataset.copy);
-      showToast(`${button.dataset.copyLabel}已复制：${button.dataset.copy}`);
-    } catch {
-      showToast(`请手动复制${button.dataset.copyLabel}：${button.dataset.copy}`);
-    }
-  });
-});
-document.querySelector('#year').textContent = new Date().getFullYear();
+const dockLinks=[...document.querySelectorAll('.dock-item')];
+if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(!entry.isIntersecting)return;dockLinks.forEach(link=>{const active=link.hash===`#${entry.target.id}`;link.classList.toggle('is-active',active);if(active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});});},{rootMargin:'-25% 0px -50% 0px'});document.querySelectorAll('main>section[id]').forEach(section=>observer.observe(section));}
+document.querySelector('#year').textContent=new Date().getFullYear();
