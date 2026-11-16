@@ -1,0 +1,33 @@
+Official company logo sources — retrieved 2026-11-16
+
+All SVG artwork is the original official asset or an unmodified inline SVG from the official navigation. No paths have been recreated, traced, or substituted. Brand marks identify the companies in Ye Wei’s experience and do not imply endorsement.
+
+Tenorshare / 软牛科技
+Page: https://www.tenorshare.com/
+Asset: https://images.tenorshare.com/img-2023/header/header-logo.svg
+Local: tenorshare.svg
+Natural size: 190 x 40; viewBox 0 0 190 40.
+Note: This is the Tenorshare brand, associated with the resume’s product lines; retain the employer name 软牛科技 in the adjacent text.
+
+Insta360 / 影石
+Page: https://www.insta360.com/press/logo
+Asset: https://wassets.insta360.com/common/739ce316523b43ed953175d4d4f03c64/black-sc.svg
+Local: insta360.svg
+Natural size: 757 x 104; viewBox 0 0 757 104.
+
+OPPO
+Page and source: https://www.oppo.com/en/
+Source element: official header anchor aria-label="OPPO homepage", first inline SVG.
+Local: oppo.svg
+Natural size: 85 x 22; viewBox 0 0 85 22.
+The complete SVG was extracted verbatim from the official page; no path or color modifications.
+
+科大讯飞 / iFLYTEK
+Page: https://www.iflytek.com/en/
+Asset: https://www.iflytek.com/en/Public/Uploads/uploadfile/images/20230812/comlogo1.svg
+Local: iflytek.svg
+Natural size: 168 x 33; viewBox 0 0 168 33.
+
+GURU 游戏公司
+Use the text label "GURU 游戏公司" rather than an image logo.
+The resume does not identify a legal entity or official company URL. Several unrelated companies use the GURU name; assigning one of their logos would be speculative.

@@ -1,9 +1,10 @@
-// 可视化编辑器的初始内容。未填写的链接和生活信息不会被伪造。
+// 网站内容与旧编辑稿迁移。项目期数据与待填证明链接分别保留。
 window.websiteDefaults = {
   "schemaVersion": 1,
+  "structureVersion": 2,
   "site": {
     "name": "叶薇",
-    "tagline": "做内容，做出海营销，也会自己搭点工具。",
+    "tagline": "达人营销 / 社媒运营 / SEO / AI 工作流",
     "email": "2013519586@qq.com",
     "wechat": "Qzsa_w"
   },
@@ -13,48 +14,19 @@ window.websiteDefaults = {
       "name": "首页",
       "portraitImage": "assets/yewei-hanging-portrait.png",
       "title": "HELLO,\nI’M YE WEI.",
-      "subtitle": "做内容，做出海营销，也会自己搭点工具。",
+      "subtitle": "达人营销 / 社媒运营 / SEO / AI 工作流",
       "background": {
         "color": "#fbfaf5",
         "image": "assets/yewei-seaside-background.png",
         "overlay": 0.22
       },
-      "sections": [
-        {
-          "id": "home-about",
-          "kind": "text",
-          "title": "你好，我是叶薇。",
-          "subtitle": "从语言，到内容、产品和增长。",
-          "items": [
-            {
-              "id": "intro",
-              "title": "先认识一下",
-              "text": "我毕业于西南财经大学英语口译专业，英语专八，也学过西语和法语。现在在深圳，做英文 SEO 和海外达人合作，也在经营 TikTok Shop 墨西哥店铺。",
-              "url": "",
-              "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
-            },
-            {
-              "id": "doing",
-              "title": "我正在做的事",
-              "text": "把工作里重复、费时间的环节整理成流程，再用 Codex 等工具搭成自己的工作台。这里放着我的经历、内容和一些新尝试。",
-              "url": "",
-              "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
-            }
-          ]
-        }
-      ]
+      "sections": []
     },
     {
       "id": "experience",
       "name": "Experience",
-      "title": "这些地方，\n我待过。",
-      "subtitle": "点击公司，看看我具体做了什么。",
+      "title": "工作经历",
+      "subtitle": "公司 / 职位 / 行业",
       "background": {
         "color": "#fbfaf5",
         "image": "",
@@ -64,17 +36,17 @@ window.websiteDefaults = {
         {
           "id": "experience-companies",
           "kind": "companies",
-          "title": "我的工作与实习经历",
-          "subtitle": "产品、内容、营销，以及在业务里动手做工具。",
+          "title": "工作与实习",
+          "subtitle": "",
           "items": [
             {
               "id": "softbull",
               "title": "软牛科技",
-              "text": "先在产品部轮岗一个月，2026 年 8 月起转入英语 SEO，负责 iCareFone、ReiBoot、4uKey 的英文内容与海外达人合作。",
+              "text": "英文 SEO、海外达人合作与 AI 运营系统。",
               "url": "",
-              "image": "",
+              "image": "assets/logos/tenorshare.svg",
               "meta": "2026.07 — 至今 · 管培生 · 英语 SEO 与海外渠道运营",
-              "details": "工作经历\n2026.07 — 至今\n管培生 · 英语 SEO 与海外渠道运营\n\n我负责什么\n• 负责英文选题、结构撰写、外包协作、质量检查与站内上线，用 Ahrefs、Semrush、GSC 和 GA4 做关键词研究与内容复盘。\n• 负责 YouTube 达人挖掘、英语建联、议价及合作跟进，拆解视频的选题、开场、脚本、CTA 与落地页承接。\n• 用 Codex 等工具搭建达人 BD 工作台，串联频道筛选、历史合作查询、入库、邮件建联与效果评估，并接入运营系统、YouTube 和 GA4 数据。\n• 搭建 SEO 内容生产工作台，连接热点与竞品研究、Keywords Planner API 关键词验证、AI 初稿与配图、人工质检。\n• 将文章模板和 HTML 规范封装为 AI Skill，接入公司 CMS API；标准任务由 AI 执行，关键选择与资源投入由人工确认。\n\n做出的结果\n• 达人工作台沉淀 800+ 个频道，单人日均有效触达从 50 位提升至 100 位。\n• 单篇内容筹备人工工时从 4 小时降至 1 小时；单篇 CMS 上稿从 120 分钟降至 25 分钟。\n• 累计交付 40 篇英文文章，新文章 7 天内收录率 90%；新增 62 个目标关键词进入 Google 前 30，其中 19 个进入前 10。\n• 统计期内触达 300 位 YouTube 达人、达成 100 位合作，上线 200 条渠道视频，其中 50 条为独立视频。\n• 合作累计引流 6,000 次会话、带来 800 次下载，单次下载合作成本为 2.3 美元。\n• 工作流已用于日常内容制作、达人开发和效果复盘，沉淀 3 份 AI 提效 SOP，推动所在部门使用。",
+              "details": "负责 iCareFone、ReiBoot、4uKey 英文内容与 YouTube 达人合作。\n自主搭建达人 BD、内容生产与 CMS 上稿工具，沉淀 3 份 SOP。",
               "steps": [],
               "metrics": [
                 {
@@ -89,16 +61,20 @@ window.websiteDefaults = {
                   "value": "19 个",
                   "label": "进入 Google 前 10 的目标关键词"
                 }
-              ]
+              ],
+              "links": [],
+              "role": "管培生 · 英语 SEO 与海外渠道运营",
+              "industry": "软件 / 工具产品",
+              "period": "2026.07 — 至今"
             },
             {
               "id": "insta360",
               "title": "影石 Insta360",
-              "text": "围绕 Flow 产品线做抖音创作者合作，把 AI 追踪、盗梦空间等产品卖点转化为拍摄场景，并参与创作者招募。",
+              "text": "抖音 KOC 合作、场景创意验证与创作者招募。",
               "url": "",
-              "image": "",
+              "image": "assets/logos/insta360.svg",
               "meta": "2025.11 起 · Flow 产品线市场营销",
-              "details": "实习经历\n2025.11 起\nFlow 产品线市场营销\n\n我负责什么\n• 自主建联并合作抖音 KOC，积累颜值、影像、舞蹈及大众运动类创作者资源。\n• 提炼核心产品卖点，输出内容 Brief、建立内容生产 SOP，并与创作者验证球类、情侣盗梦空间等拍摄创意。\n• 主导 Flow2 系列创作者招募，通过账号分层与激励机制推进报名和合作。\n\n做出的结果\n• 3 个月内合作 250+ 位抖音 KOC，累计发布 400+ 条视频，获得 4,200 万曝光。\n• 输出 20 份 Brief；球类模板对应 123 条内容，累计获得 2,000 万曝光。\n• 情侣盗梦空间创意首条合作视频获得 200 万+播放，后续复刻累计获得 500 万+曝光。\n• Flow2 创作者招募半个月吸引 800+ 报名、促成 200+ 合作；该招募数据与上述 3 个月 KOC 合作数据不相加。",
+              "details": "自主建联抖音 KOC，提炼 AI 追踪、盗梦空间等产品卖点。\n输出 20 份 Brief 与内容 SOP，主导 Flow2 创作者招募。",
               "steps": [],
               "metrics": [
                 {
@@ -113,16 +89,20 @@ window.websiteDefaults = {
                   "value": "4,200 万",
                   "label": "合作内容累计曝光"
                 }
-              ]
+              ],
+              "links": [],
+              "role": "Flow 产品线市场营销",
+              "industry": "消费电子 / 影像",
+              "period": "2025.11 起"
             },
             {
               "id": "oppo",
               "title": "OPPO",
-              "text": "参与奥地利市场 Instagram 官号启动，做内容本地化、达人合作、投放跟进与用户研究。",
+              "text": "奥地利 Instagram 官号启动、内容本地化与投放跟进。",
               "url": "",
-              "image": "",
+              "image": "assets/logos/oppo.svg",
               "meta": "2025.07 — 2025.11 · 海外数字营销",
-              "details": "实习经历\n2025.07 — 2025.11\n海外数字营销\n\n我负责什么\n• 制定奥地利市场 Instagram 官号运营策略，安排内容排期、完成素材本地化，支持新品上市前的官号启动。\n• 对接当地 KOC 与 KOL，推进内容合作；联系 TikTok、Meta 等平台的投放代理，跟进不同平台与人群的曝光、点击表现。\n• 根据投放表现调整预算，对高转化人群及 TikTok 增加 30% 预算，对点击成本超标的平台缩减 15% 投放。\n• 筛选并访谈当地核心用户，收集品牌认知、产品偏好和广告触达反馈，结合社媒热点完善用户画像与运营方案。\n\n做出的结果\n• 合作 20 位 KOC、2 位 KOL，KOC 内容累计曝光 200 万+。\n• 二次投放 CTR 达到 4.8%，较首轮提升 40%；单周期曝光 700 万，CPC 维持在 0.16 美元。\n• 完成 20+ 位奥地利核心用户访谈，输出 Instagram 社媒运营方案。",
+              "details": "制定内容排期，完成素材本地化并对接 KOC、KOL。\n跟进 TikTok、Meta 投放表现，访谈 20+ 位当地核心用户。",
               "steps": [],
               "metrics": [
                 {
@@ -137,16 +117,20 @@ window.websiteDefaults = {
                   "value": "20+",
                   "label": "访谈奥地利核心用户"
                 }
-              ]
+              ],
+              "links": [],
+              "role": "海外数字营销",
+              "industry": "消费电子 / 手机",
+              "period": "2025.07 — 2025.11"
             },
             {
               "id": "iflytek",
               "title": "科大讯飞",
-              "text": "参与 AI 彩铃 2.0 至 3.0 迭代，做提示词优化、功能需求与原型设计，也承担内容推广工作。",
+              "text": "AI 彩铃提示词优化、功能需求与产品原型。",
               "url": "",
-              "image": "",
-              "meta": "2025.04 — 2025.07 · AI 产品经理",
-              "details": "实习经历\n2025.04 — 2025.07\nAI 产品经理\n\n我负责什么\n• 设计 AI 彩铃“家乡系列”的内容元素与提示词，把地方特色、画面风格等要求转成 Prompt，并调整提示词结构。\n• 根据客户需求联动设计、技术，参与人脸上传、单人及多人照片交互、上传流程与个人主页等功能迭代。\n• 设计数字人彩铃开场原型，承担地方中国移动定制彩铃的产品原型设计。\n• 运营咪咕音乐订阅号，结合访问数据策划彩铃资讯，并剪辑商家推广彩铃模板。\n\n做出的结果\n• “家乡系列”内容可用率从 70% 提升至 90%，支持日均 10 万+彩铃生成。\n• 在 AI 彩铃 2.0 至 3.0 迭代中联动推进 5 项功能。\n• 订阅号月均推送 10 篇攻略，周访问量新增 20 万；剪辑 10 个商家推广彩铃模板。",
+              "image": "assets/logos/iflytek.svg",
+              "meta": "2025.04 — 2025.07 · AI 产品经理实习生",
+              "details": "参与 AI 彩铃 2.0 至 3.0 迭代，联动设计、技术推进 5 项功能。\n设计“家乡系列”提示词与数字人彩铃原型，运营咪咕音乐订阅号。",
               "steps": [],
               "metrics": [
                 {
@@ -161,16 +145,20 @@ window.websiteDefaults = {
                   "value": "10 万+",
                   "label": "支持的日均彩铃生成量"
                 }
-              ]
+              ],
+              "links": [],
+              "role": "AI 产品经理实习生",
+              "industry": "AI / 数字内容",
+              "period": "2025.04 — 2025.07"
             },
             {
               "id": "guru",
               "title": "GURU 游戏公司",
-              "text": "从 0 到 1 运营 TikTok 官号，制作原生 AI 特效内容，并把用户反馈带回产品迭代。",
+              "text": "从 0 到 1 运营 TikTok 官号，制作 AI 特效内容。",
               "url": "",
               "image": "",
               "meta": "2024.12 — 2025.03 · 海外 AI 产品运营",
-              "details": "实习经历\n2024.12 — 2025.03\n海外 AI 产品运营\n\n我负责什么\n• 从 0 到 1 运营 TikTok 官号，结合热点和竞品研究制作 AI 特效视频，整理内容运营方法与 SOP。\n• 用 AIGC 工具生成特效内容，沉淀可复用的图片模板与视频特效模板。\n• 收集用户反馈，协同产品、设计及技术优化内容发现与浏览路径，推进页面二级标题、特效上新提示等功能。\n\n做出的结果\n• 产出 200+ 条原生 AI 特效视频，投流后一周粉丝破万，最高单条播放量 20.4 万。\n• 沉淀 100+ 图片模板、50+ 视频特效模板，相关特效一周生成量 50 万+。\n• 协同团队落地 2 项功能优化，迭代期产品 DAU 上涨 10%。",
+              "details": "结合热点与竞品研究制作原生 AI 特效视频，沉淀内容模板与 SOP。\n收集用户反馈，协同团队落地 2 项功能优化；投流后一周粉丝破万。",
               "steps": [],
               "metrics": [
                 {
@@ -185,45 +173,21 @@ window.websiteDefaults = {
                   "value": "50 万+",
                   "label": "相关特效一周生成量"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "education",
-          "kind": "text",
-          "title": "教育背景",
-          "subtitle": "",
-          "items": [
-            {
-              "id": "swufe",
-              "title": "西南财经大学 · 英语口译硕士",
-              "text": "2024.09 — 2026.06 · 211",
-              "url": "",
-              "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
-            },
-            {
-              "id": "tjfsu",
-              "title": "天津外国语大学滨海外事学院 · 翻译本科",
-              "text": "2019.09 — 2023.06",
-              "url": "",
-              "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
+              ],
+              "links": [],
+              "role": "海外 AI 产品运营",
+              "industry": "游戏 / AI 应用",
+              "period": "2024.12 — 2025.03"
             }
           ]
         }
       ]
     },
     {
-      "id": "building",
-      "name": "Building",
-      "title": "正在做，\n也正在尝试。",
-      "subtitle": "我的内容、作品、代码和自动化流程。",
+      "id": "capability",
+      "name": "Capability",
+      "title": "运营能力",
+      "subtitle": "爆款内容 / 品牌账号 / 搜索增长",
       "background": {
         "color": "#fbfaf5",
         "image": "",
@@ -231,10 +195,95 @@ window.websiteDefaults = {
       },
       "sections": [
         {
+          "id": "influencer",
+          "kind": "capability",
+          "title": "达人营销",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "douyin-insta360",
+              "title": "抖音｜Insta360",
+              "text": "擅长爆款策划，从 0 到 1 验证并复用内容模板。",
+              "url": "",
+              "image": "",
+              "meta": "国内 · 创作者合作",
+              "details": "球类模板：123 条内容，累计 2,000 万曝光。\n情侣盗梦空间创意首条 200 万+播放，后续复刻累计 500 万+曝光。",
+              "steps": [
+                "卖点拆解",
+                "创意验证",
+                "模板复用"
+              ],
+              "metrics": [
+                {
+                  "value": "250+",
+                  "label": "合作 KOC"
+                },
+                {
+                  "value": "400+",
+                  "label": "合作视频"
+                },
+                {
+                  "value": "4,200 万",
+                  "label": "累计曝光"
+                }
+              ],
+              "links": [
+                {
+                  "label": "查看爆款内容",
+                  "url": ""
+                },
+                {
+                  "label": "查看 0→1 内容模板",
+                  "url": ""
+                }
+              ]
+            },
+            {
+              "id": "youtube-softbull",
+              "title": "YouTube｜软牛",
+              "text": "海外达人开发、合作跟进与转化复盘。",
+              "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
+              "image": "",
+              "meta": "海外 · 达人合作",
+              "details": "负责频道筛选、英语建联、议价与合作跟进，用转化数据复盘合作效果。",
+              "steps": [
+                "筛选频道",
+                "英语建联",
+                "合作跟进",
+                "效果复盘"
+              ],
+              "metrics": [
+                {
+                  "value": "100 位",
+                  "label": "合作达人"
+                },
+                {
+                  "value": "50 条",
+                  "label": "独立视频"
+                },
+                {
+                  "value": "6,000",
+                  "label": "引流会话"
+                }
+              ],
+              "links": [
+                {
+                  "label": "查看代表合作视频",
+                  "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s"
+                },
+                {
+                  "label": "补充合作案例",
+                  "url": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
           "id": "social",
-          "kind": "links",
-          "title": "社媒",
-          "subtitle": "我的小红书爆款和 TikTok 账号。",
+          "kind": "capability",
+          "title": "社媒运营",
+          "subtitle": "",
           "items": [
             {
               "id": "tiktok",
@@ -244,115 +293,89 @@ window.websiteDefaults = {
               "image": "",
               "meta": "TikTok",
               "details": "",
-              "steps": []
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "访问 TikTok",
+                  "url": "https://www.tiktok.com/@jesus.holds.you"
+                }
+              ]
+            },
+            {
+              "id": "oppo-austria",
+              "title": "@oppo.austria",
+              "text": "奥地利市场品牌社媒账号。",
+              "url": "https://www.tiktok.com/@oppo.austria",
+              "image": "",
+              "meta": "TikTok · 奥地利",
+              "details": "内容本地化、账号运营与达人合作。",
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "访问 TikTok",
+                  "url": "https://www.tiktok.com/@oppo.austria"
+                }
+              ]
             },
             {
               "id": "rednote",
-              "title": "小红书 · 爆款帖子",
-              "text": "我做过的一篇内容。",
+              "title": "小红书 · 爆款内容",
+              "text": "自己做过的一篇内容。",
               "url": "https://www.xiaohongshu.com/explore/64644c650000000027010035?xsec_token=ABslPFD3OynjggrGcqOr6iNJeoteEAtef9axBw0V4eSJw=&xsec_source=pc_user",
               "image": "",
-              "meta": "小红书",
+              "meta": "内容案例",
               "details": "",
-              "steps": []
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "查看小红书内容",
+                  "url": "https://www.xiaohongshu.com/explore/64644c650000000027010035?xsec_token=ABslPFD3OynjggrGcqOr6iNJeoteEAtef9axBw0V4eSJw=&xsec_source=pc_user"
+                }
+              ]
             }
           ]
         },
         {
-          "id": "intern-videos",
-          "kind": "videos",
-          "title": "实习爆款视频",
-          "subtitle": "在这里补上视频封面、作品链接和我负责的部分。",
+          "id": "seo",
+          "kind": "capability",
+          "title": "SEO运营",
+          "subtitle": "",
           "items": [
             {
-              "id": "insta-couple",
-              "title": "Flow 情侣盗梦空间",
-              "text": "参与创意玩法验证与 KOC 合作。首条合作视频 200 万+播放，后续复刻累计 500 万+曝光。",
-              "url": "",
+              "id": "seo-video",
+              "title": "YouTube 内容与搜索",
+              "text": "Google AI Overview 引用。",
+              "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
               "image": "",
-              "meta": "影石 Insta360",
-              "details": "我的工作：验证情侣盗梦空间创意玩法，并与 KOC 推进合作。\n\n结果口径：首条合作视频 200 万+播放；后续复刻累计 500 万+曝光。\n\n待补充对应视频链接与封面。",
-              "steps": []
-            },
-            {
-              "id": "guru-video",
-              "title": "AI 特效内容",
-              "text": "从 0 到 1 运营 TikTok 官号，制作 200+条原生 AI 特效视频，最高单条播放 20.4 万。",
-              "url": "",
-              "image": "",
-              "meta": "GURU · AI 产品运营",
-              "details": "我的工作：结合热点、竞品研究制作 AI 特效内容，沉淀运营方法与模板。\n\n结果：投流后一周粉丝破万；最高单条播放量 20.4 万。\n\n待补充对应视频链接与封面。",
-              "steps": []
-            }
-          ]
-        },
-        {
-          "id": "github",
-          "kind": "links",
-          "title": "GitHub",
-          "subtitle": "自己做的小工具与代码。",
-          "items": [
-            {
-              "id": "github-home",
-              "title": "我的 GitHub",
-              "text": "把你的 GitHub 主页链接填在这里，也可以继续添加想展示的仓库。",
-              "url": "",
-              "image": "",
-              "meta": "主页链接待填写",
+              "meta": "项目期表现",
               "details": "",
-              "steps": []
-            }
-          ]
-        },
-        {
-          "id": "ai-workflows",
-          "kind": "workflow",
-          "title": "AI 自动化流程",
-          "subtitle": "从业务问题出发，把重复工作串成可以复用的流程。",
-          "items": [
-            {
-              "id": "bd",
-              "title": "海外达人 BD 工作台",
-              "text": "串联频道筛选、历史合作、邮件建联和效果评估。",
-              "url": "",
-              "image": "",
-              "meta": "有效触达 50 → 100 位 / 日",
-              "details": "我将粉丝规模、活跃度、英语内容与竞品官方号排除等经验判断拆成可校验规则，并接入运营系统、YouTube 与 GA4 数据。\n\n沉淀 800+个频道。关键合作选择与资源投入由人工确认。",
-              "steps": [
-                "关键词挖掘",
-                "筛选频道",
-                "建联跟进",
-                "效果评估"
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "查看代表视频",
+                  "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s"
+                }
               ]
             },
             {
-              "id": "seo",
-              "title": "SEO 内容生产工作台",
-              "text": "将热点研究、关键词验证、AI 初稿和人工质检串起来。",
-              "url": "",
+              "id": "seo-article",
+              "title": "站外文章与搜索",
+              "text": "SERP 首页第 1 位。",
+              "url": "https://www.concept-phones.com/apple/iphone-18-pro-stuck-on-preparing-to-transfer/",
               "image": "",
-              "meta": "单篇筹备人工工时 4h → 1h",
-              "details": "通过热点监测与竞品内容缺口发现选题，用 Keywords Planner API 验证搜索量。AI 生成初稿与配图，人工完成事实核对和产品信息校准。",
-              "steps": [
-                "热点与竞品缺口",
-                "关键词验证",
-                "AI 初稿与配图",
-                "人工质检"
-              ]
-            },
-            {
-              "id": "cms",
-              "title": "CMS 自动上稿",
-              "text": "把 HTML 模板规范封装成 Skill，接入公司 CMS API。",
-              "url": "",
-              "image": "",
-              "meta": "单篇上稿耗时 120 → 25min",
-              "details": "将依赖经验的排版和站点规范整理成可复用规则。按站点要求生成 HTML，并通过 CMS API 完成上稿。",
-              "steps": [
-                "读取文章",
-                "按模板生成 HTML",
-                "规范校验",
-                "CMS 上稿"
+              "meta": "项目期表现",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "查看文章",
+                  "url": "https://www.concept-phones.com/apple/iphone-18-pro-stuck-on-preparing-to-transfer/"
+                }
               ]
             }
           ]
@@ -360,10 +383,10 @@ window.websiteDefaults = {
       ]
     },
     {
-      "id": "life",
-      "name": "生活",
-      "title": "生活里的我，\n慢慢认识。",
-      "subtitle": "照片、个性、爱好，还有工作之外的那些小事。",
+      "id": "ai",
+      "name": "AI 应用",
+      "title": "AI 应用",
+      "subtitle": "BD / 内容生产 / CMS",
       "background": {
         "color": "#fbfaf5",
         "image": "",
@@ -371,98 +394,174 @@ window.websiteDefaults = {
       },
       "sections": [
         {
-          "id": "personality",
-          "kind": "text",
-          "title": "我的个人说明书",
-          "subtitle": "这些地方留给你自己填写。",
+          "id": "ai-workflows",
+          "kind": "workflow",
+          "title": "业务工作流",
+          "subtitle": "",
           "items": [
             {
-              "id": "personality-note",
-              "title": "我的个性",
-              "text": "写下你最想让别人认识的几面：平时是什么样的人，和朋友相处是什么样子。",
+              "id": "bd",
+              "title": "海外达人 BD 工作台",
+              "text": "串联筛选、建联、合作跟进与效果评估。",
               "url": "",
               "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
+              "meta": "日均有效触达 50 → 100 位",
+              "details": "将频道适配判断拆成规则，接入运营系统、YouTube 与 GA4。\n沉淀 800+ 个频道，关键选择与资源投入保留人工确认。",
+              "steps": [
+                "关键词挖掘",
+                "筛选频道",
+                "建联跟进",
+                "效果评估"
+              ],
+              "metrics": [
+                {
+                  "value": "50 → 100",
+                  "label": "日均有效触达 / 位"
+                },
+                {
+                  "value": "800+",
+                  "label": "沉淀频道"
+                }
+              ],
+              "links": [
+                {
+                  "label": "查看演示 / Demo",
+                  "url": ""
+                },
+                {
+                  "label": "GitHub 仓库",
+                  "url": ""
+                }
+              ]
             },
             {
-              "id": "hobbies",
-              "title": "喜欢的事",
-              "text": "可以放爱好、常做的小事、喜欢的电影、音乐或书。",
+              "id": "seo",
+              "title": "SEO 内容生产工作台",
+              "text": "热点研究、关键词验证、AI 初稿与人工质检。",
               "url": "",
               "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
+              "meta": "单篇筹备人工工时 4h → 1h",
+              "details": "用 Keywords Planner API 验证搜索量；AI 生成初稿与配图，人工核对事实与产品信息。",
+              "steps": [
+                "热点与内容缺口",
+                "关键词验证",
+                "AI 初稿与配图",
+                "人工质检"
+              ],
+              "metrics": [
+                {
+                  "value": "4h → 1h",
+                  "label": "单篇筹备人工工时"
+                }
+              ],
+              "links": [
+                {
+                  "label": "查看演示 / Demo",
+                  "url": ""
+                },
+                {
+                  "label": "GitHub 仓库",
+                  "url": ""
+                }
+              ]
             },
             {
-              "id": "mbti",
-              "title": "MBTI / 关于我的几个词",
-              "text": "如果你想展示 MBTI，或者几个能描述自己的词，可以填在这里。",
+              "id": "cms",
+              "title": "CMS 自动上稿",
+              "text": "将 HTML 模板规范封装成 Skill，接入 CMS API。",
               "url": "",
               "image": "",
-              "meta": "",
-              "details": "",
-              "steps": []
+              "meta": "单篇上稿 120 → 25min",
+              "details": "读取站点规范，生成并校验 HTML，再通过接口完成上稿。",
+              "steps": [
+                "读取规范",
+                "生成 HTML",
+                "规范校验",
+                "CMS 上稿"
+              ],
+              "metrics": [
+                {
+                  "value": "120 → 25min",
+                  "label": "单篇上稿耗时"
+                }
+              ],
+              "links": [
+                {
+                  "label": "查看演示 / Demo",
+                  "url": ""
+                },
+                {
+                  "label": "GitHub 仓库",
+                  "url": ""
+                }
+              ]
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "name": "联系方式",
+      "title": "联系方式",
+      "subtitle": "",
+      "background": {
+        "color": "#fbfaf5",
+        "image": "",
+        "overlay": 0.12
+      },
+      "sections": [
         {
-          "id": "life-photos",
-          "kind": "photo",
-          "title": "一些生活片段",
-          "subtitle": "先留几个位置，慢慢放进自己的照片。",
+          "id": "contact-links",
+          "kind": "links",
+          "title": "保持联系",
+          "subtitle": "",
           "items": [
             {
-              "id": "photo-1",
-              "title": "照片 01",
-              "text": "",
-              "url": "",
+              "id": "email",
+              "title": "邮件",
+              "text": "2013519586@qq.com",
+              "url": "mailto:2013519586@qq.com",
               "image": "",
-              "meta": "照片待添加",
+              "meta": "Email",
               "details": "",
-              "steps": []
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "发送邮件",
+                  "url": "mailto:2013519586@qq.com"
+                }
+              ]
             },
             {
-              "id": "photo-2",
-              "title": "照片 02",
-              "text": "",
+              "id": "wechat",
+              "title": "微信",
+              "text": "Qzsa_w",
               "url": "",
               "image": "",
-              "meta": "照片待添加",
-              "details": "",
-              "steps": []
+              "meta": "微信号",
+              "details": "微信号：Qzsa_w",
+              "steps": [],
+              "metrics": [],
+              "links": []
             },
             {
-              "id": "photo-3",
-              "title": "照片 03",
-              "text": "",
-              "url": "",
+              "id": "resume",
+              "title": "简历",
+              "text": "叶薇 CV · PDF",
+              "url": "assets/yewei-cv.pdf",
               "image": "",
-              "meta": "照片待添加",
+              "meta": "PDF",
               "details": "",
-              "steps": []
-            },
-            {
-              "id": "photo-4",
-              "title": "照片 04",
-              "text": "",
-              "url": "",
-              "image": "",
-              "meta": "照片待添加",
-              "details": "",
-              "steps": []
-            },
-            {
-              "id": "photo-5",
-              "title": "照片 05",
-              "text": "",
-              "url": "",
-              "image": "",
-              "meta": "照片待添加",
-              "details": "",
-              "steps": []
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "下载简历",
+                  "url": "assets/yewei-cv.pdf"
+                }
+              ]
             }
           ]
         }
@@ -471,35 +570,157 @@ window.websiteDefaults = {
   ]
 };
 
-// 兼容旧版编辑稿：仅迁移完整匹配旧默认值的背景，不覆盖自定义配色或照片。
-// 主动移除的悬挂照片（空字符串）保留；缺少该字段时补入新默认照片。
-window.migrateWebsiteDraftPhotos = function (value) {
+// 纯数据迁移：不读写 localStorage；旧稿备份由编辑器负责。
+window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
   if (!value || value.schemaVersion !== 1 || !Array.isArray(value.pages)) return value;
+  const own = (object,key) => Object.prototype.hasOwnProperty.call(object,key);
+  const clone = object => JSON.parse(JSON.stringify(object));
+  const isObject = object => object && typeof object === 'object' && !Array.isArray(object);
+  const defaults = window.websiteDefaults;
   const previousBackgrounds = {
-    home: [
-      { color: '#faf8ef', image: 'assets/meadow.jpg', overlay: 0.22 },
-      { color: '#faf8ef', image: 'assets/yewei-seaside-background.png', overlay: 0.22 }
+    home:[
+      {color:'#faf8ef',image:'assets/meadow.jpg',overlay:0.22},
+      {color:'#faf8ef',image:'assets/yewei-seaside-background.png',overlay:0.22}
     ],
-    experience: [{ color: '#faf8ef', image: '', overlay: 0.12 }],
-    building: [{ color: '#e8e4ef', image: '', overlay: 0.12 }],
-    life: [{ color: '#f5eedf', image: '', overlay: 0.12 }]
+    experience:[{color:'#faf8ef',image:'',overlay:0.12}],
+    capability:[{color:'#e8e4ef',image:'',overlay:0.12}],
+    building:[{color:'#e8e4ef',image:'',overlay:0.12}],
+    life:[{color:'#f5eedf',image:'',overlay:0.12}]
   };
-  let changed = false;
+  let photoChanged = false;
   const pages = value.pages.map(page => {
-    if (!page || typeof page !== 'object') return page;
-    const defaults = window.websiteDefaults.pages.find(item => item.id === page.id);
-    if (!defaults) return page;
-    let nextPage = page;
-    const bg = page.background;
-    const previous = Object.prototype.hasOwnProperty.call(previousBackgrounds, page.id) ? previousBackgrounds[page.id] : [];
-    if (bg && previous.some(old => bg.color === old.color && bg.image === old.image && bg.overlay === old.overlay)) {
-      nextPage = { ...nextPage, background: { ...bg, ...defaults.background } };
+    if (!isObject(page)) return page;
+    const standard = defaults.pages.find(p=>p.id===page.id);
+    let next = page;
+    if (isObject(page.background) && (previousBackgrounds[page.id]||[]).some(bg=>bg.color===page.background.color && bg.image===page.background.image && bg.overlay===page.background.overlay)) {
+      // 先修复旧 building / life 的默认底色，再映射到新页面。
+      // 完整三元组必须匹配；用户改过图片、颜色或遮罩均不受影响。
+      next = {...next,background:{...page.background,...(standard?.background || {color:'#fbfaf5'})}};
     }
-    if (page.id === 'home' && !Object.prototype.hasOwnProperty.call(page, 'portraitImage')) {
-      nextPage = { ...nextPage, portraitImage: defaults.portraitImage };
-    }
-    if (nextPage !== page) changed = true;
-    return nextPage;
+    if (page.id==='home' && standard && !own(page,'portraitImage')) next={...next,portraitImage:standard.portraitImage};
+    if (next!==page) photoChanged=true;
+    return next;
   });
-  return changed ? { ...value, pages } : value;
+  const taglineChanged = isObject(value.site) && value.site.tagline==='做内容，做出海营销，也会自己搭点工具。';
+  const photoDraft = photoChanged || taglineChanged
+    ? {...value,pages,...(taglineChanged ? {site:{...value.site,tagline:defaults.site.tagline}} : {})}
+    : value;
+  const needsStructure = !own(value,'structureVersion') || value.structureVersion === 1;
+  if (!needsStructure) return photoDraft;
+  const next = clone(defaults);
+  if (isObject(photoDraft.site)) next.site={...next.site,...clone(photoDraft.site)};
+  const oldPage = id => pages.find(p=>isObject(p)&&p.id===id);
+  const nextPage = id => next.pages.find(p=>p.id===id);
+  const oldSection = (page,id,kind) => page?.sections?.find(s=>isObject(s)&&(s.id===id || s.kind===kind));
+  const copyPageBackground = (source,target) => {
+    if (source && own(source,'background') && isObject(source.background)) target.background=clone(source.background);
+  };
+  const emptyItem = id => ({id,title:'',text:'',url:'',image:'',meta:'',details:'',steps:[],metrics:[],links:[]});
+  function mergeItem(standard,old) {
+    if (!isObject(old)) return clone(standard);
+    const base = standard || emptyItem(old.id);
+    const merged={...clone(base),...clone(old)};
+    if (standard?.image && old.image==='') merged.image=standard.image;
+    const links=[];
+    const addLink = candidate => {
+      if (!isObject(candidate) || typeof candidate.label!=='string' || typeof candidate.url!=='string') return;
+      if (links.some(saved=>candidate.url ? saved.url===candidate.url : !saved.url && saved.label===candidate.label)) return;
+      links.push(clone(candidate));
+    };
+    if (Array.isArray(old.links)) old.links.forEach(addLink);
+    if (typeof old.url==='string' && old.url) {
+      const label=base.links?.find(l=>l.url===old.url)?.label || base.links?.[0]?.label || '查看链接';
+      addLink({label,url:old.url});
+    }
+    if (!own(old,'url') && !own(old,'links')) (base.links||[]).forEach(addLink);
+    else (base.links||[]).filter(l=>!l.url).forEach(addLink);
+    merged.links=links;
+    if (standard?.role && typeof old.meta==='string' && old.meta!==standard.meta && !own(old,'role')) {
+      const parts=old.meta.split(' · ');
+      if (/^20\d\d/.test(parts[0])) {merged.period=parts.shift();if(parts.length)merged.role=parts.join(' · ');}
+      else if (old.meta.trim()) merged.role=old.meta;
+    }
+    return merged;
+  }
+  function migrateItems(source,target,keepNewItems=false) {
+    if (!source || !Array.isArray(source.items)) return;
+    const standards=target.items;
+    if (!keepNewItems) {
+      target.items=source.items.filter(isObject).map(old=>mergeItem(standards.find(item=>item.id===old.id),old));
+      return;
+    }
+    for (const old of source.items.filter(isObject)) {
+      const index=target.items.findIndex(item=>item.id===old.id);
+      if (index>=0) target.items[index]=mergeItem(target.items[index],old);
+      else target.items.push(mergeItem(null,old));
+    }
+  }
+  const oldHome=oldPage('home'),home=nextPage('home');
+  if (oldHome) {
+    copyPageBackground(oldHome,home);
+    if (own(oldHome,'portraitImage')) home.portraitImage=oldHome.portraitImage;
+    if (typeof oldHome.title==='string') home.title=oldHome.title;
+    if (typeof oldHome.subtitle==='string' && !['做内容，做出海营销，也会自己搭点工具。','达人营销 / 社媒运营 / SEO / AI 工作流'].includes(oldHome.subtitle)) home.subtitle=oldHome.subtitle;
+  }
+  const experience=nextPage('experience'),oldExperience=oldPage('experience');
+  copyPageBackground(oldExperience,experience);
+  migrateItems(oldSection(oldExperience,'experience-companies','companies'),experience.sections[0]);
+  const building=oldPage('building'),oldCapability=oldPage('capability'),capability=nextPage('capability');
+  copyPageBackground(oldCapability||building,capability);
+  for (const section of capability.sections) {
+    const existing=oldCapability?.sections?.find(s=>s.id===section.id);
+    if (existing) migrateItems(existing,section);
+  }
+  if (!oldCapability) migrateItems(oldSection(building,'social','links'),capability.sections.find(s=>s.id==='social'),true);
+  const social=capability.sections.find(s=>s.id==='social');
+  const knownAccount = item => {
+    const urls=[item.url,...(item.links||[]).map(l=>l.url)].filter(url=>typeof url==='string');
+    if (urls.some(url=>/^https?:\/\/(?:www\.)?tiktok\.com\/@jesus\.holds\.you\/?(?:[?#].*)?$/i.test(url))) return 'tiktok-jesus';
+    if (urls.some(url=>/^https?:\/\/(?:www\.)?tiktok\.com\/@oppo\.austria\/?(?:[?#].*)?$/i.test(url))) return 'oppo-austria';
+    return '';
+  };
+  const uniqueSocial=[];
+  for (const item of social.items) {
+    const key=knownAccount(item);
+    const index=key ? uniqueSocial.findIndex(saved=>knownAccount(saved)===key) : -1;
+    if (index<0) {uniqueSocial.push(item);continue;}
+    const saved=uniqueSocial[index];
+    const merged=mergeItem(saved,item);
+    merged.id=saved.id;
+    for (const proof of saved.links||[]) {
+      if (!merged.links.some(link=>proof.url ? link.url===proof.url : !link.url && link.label===proof.label)) merged.links.push(clone(proof));
+    }
+    uniqueSocial[index]=merged;
+  }
+  social.items=uniqueSocial;
+  const oldVideos=oldSection(building,'intern-videos','videos');
+  if (oldVideos && Array.isArray(oldVideos.items)) {
+    for (const old of oldVideos.items.filter(isObject)) {
+      if (old.id!=='insta-couple') continue;
+      const domestic=capability.sections.find(s=>s.id==='influencer').items.find(i=>i.id==='douyin-insta360');
+      if (domestic && old.url) {
+        const proof={label:old.title || '查看爆款内容',url:old.url};
+        if (!domestic.links.some(link=>link.url===proof.url)) domestic.links.unshift(proof);
+      }
+    }
+  }
+  const ai=nextPage('ai'),oldAi=oldPage('ai');
+  copyPageBackground(oldAi||building,ai);
+  migrateItems(oldSection(oldAi||building,'ai-workflows','workflow'),ai.sections[0]);
+  const contact=nextPage('contact'),oldContact=oldPage('contact');
+  copyPageBackground(oldContact,contact);
+  const email=contact.sections[0].items.find(i=>i.id==='email');
+  email.text=typeof next.site.email==='string' ? next.site.email : email.text;
+  email.url='mailto:'+encodeURIComponent(email.text);
+  email.links=[{label:'发送邮件',url:email.url}];
+  const wechat=contact.sections[0].items.find(i=>i.id==='wechat');
+  wechat.text=typeof next.site.wechat==='string' ? next.site.wechat : wechat.text;
+  wechat.details='微信号：'+wechat.text;
+  migrateItems(oldSection(oldContact,'contact-links','links'),contact.sections[0],true);
+  const github=building?.sections?.find(s=>s.id==='github');
+  if (github && Array.isArray(github.items)) for (const old of github.items.filter(isObject)) {
+    if (!old.url && !(Array.isArray(old.links)&&old.links.some(l=>l.url))) continue;
+    if (!contact.sections[0].items.some(i=>i.id===old.id)) contact.sections[0].items.push(mergeItem(null,old));
+  }
+  return next;
 };

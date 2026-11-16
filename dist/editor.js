@@ -1,8 +1,9 @@
 (() => {
   'use strict';
   const STORAGE_KEY = 'yewei.visualDraft.v1';
-  const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流' };
-  const PAGE_LABELS = { home: '首页', experience: '经历', building: '作品', life: '生活' };
+  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeCapabilities.v1';
+  const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '能力与证明' };
+  const PAGE_LABELS = { home: '首页', experience: 'Experience', capability: 'Capability', ai: 'AI应用', contact: '联系方式', building: '作品', life: '生活' };
   const MAX_JSON_BYTES = 24 * 1024 * 1024;
   const $ = selector => document.querySelector(selector);
   const els = {
@@ -13,8 +14,9 @@
   };
   const clone = value => JSON.parse(JSON.stringify(value));
   let draft;
-  let pageId = 'experience';
-  let selectedSectionId = '';
+  const editorParams = new URLSearchParams(location.search);
+  let pageId = editorParams.get('page') || 'experience';
+  let selectedSectionId = editorParams.get('section') || '';
   let saveTimer, previewTimer, toastTimer;
   let dirty = false;
   let savingFailed = false;
@@ -22,6 +24,7 @@
   let fieldCounter = 0;
   let addPickerOpen = false;
   let pendingImageJobs = 0;
+  let legacyBackupRaw = null;
 
   function node(tag, className, text) {
     const value = document.createElement(tag);
@@ -69,7 +72,12 @@
       try { const path = decodeURIComponent(input); return !path.includes('..') && !/[<>\\]/.test(path); }
       catch { return false; }
     }
-    const allowed = image ? /^https?:\/\//i : /^(?:https?:\/\/|mailto:|tel:)/i;
+    if (!image && /^assets\//i.test(input)) {
+      try { const path = decodeURIComponent(input); return /\.pdf$/i.test(path) && !path.includes('..') && !/[<>\\?#]/.test(path); }
+      catch { return false; }
+    }
+    if (!image && /^(?:mailto|tel):/i.test(input)) return /^(?:mailto|tel):[^\s]+$/i.test(input);
+    const allowed = /^https?:\/\//i;
     if (!allowed.test(input)) return false;
     try { const url = new URL(input); return (image ? ['http:', 'https:'] : ['http:', 'https:', 'mailto:', 'tel:']).includes(url.protocol); }
     catch { return false; }
@@ -88,6 +96,10 @@
     if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== 1 || !value.site || typeof value.site !== 'object' || Array.isArray(value.site)) throw new Error('这不是受支持的网站编辑稿（需要 schemaVersion: 1）。');
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
+    if (value.structureVersion !== undefined) {
+      if (![1, 2].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
+      normalized.structureVersion = value.structureVersion;
+    }
     for (const key of ['name', 'tagline', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
     let sectionCount = 0, itemCount = 0;
     const pageIds = new Set();
@@ -129,9 +141,17 @@
           if (itemIds.has(iid)) throw new Error('同一板块的内容条目标识重复。');
           itemIds.add(iid);
           const ni = { id: iid };
-          for (const key of ['title', 'text', 'url', 'image', 'meta', 'details']) ni[key] = requireString(item[key], '条目内容', key === 'image' ? 12 * 1024 * 1024 : key === 'details' ? 40000 : 20000);
+          for (const key of ['title', 'text', 'url', 'image', 'meta', 'details', 'role', 'industry', 'period']) ni[key] = requireString(item[key], '条目内容', key === 'image' ? 12 * 1024 * 1024 : key === 'details' ? 40000 : 20000);
           if (!safeUrl(ni.url)) throw new Error('条目链接含不安全的地址，请使用 http、https、mailto 或 tel 链接。');
           if (!safeUrl(ni.image, true)) throw new Error('条目图片包含不支持的地址。');
+          if (item.links !== undefined && (!Array.isArray(item.links) || item.links.length > 30)) throw new Error('每个条目最多支持 30 个关联链接。');
+          ni.links = (item.links || []).map(link => {
+            if (!link || typeof link !== 'object' || Array.isArray(link)) throw new Error('关联链接格式不正确。');
+            const label = requireString(link.label, '链接文字', 1000);
+            const url = requireString(link.url, '链接地址', 20000).trim();
+            if (!safeUrl(url)) throw new Error('关联链接含不安全的地址，请使用 http、https、mailto 或 tel 链接。');
+            return { label, url };
+          });
           if (item.steps !== undefined && (!Array.isArray(item.steps) || item.steps.length > 100)) throw new Error('流程步骤格式不正确。');
           ni.steps = (item.steps || []).map(step => requireString(step, '流程步骤', 2000));
           if (item.metrics !== undefined) {
@@ -156,9 +176,23 @@
     els.iframe.contentWindow.postMessage({ type: 'yewei-draft:update', draft, pageId }, location.origin);
   }
   function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(pushPreview, 120); }
+  function backupLegacyDraft(raw, value) {
+    if (!raw || value?.structureVersion === 2) return;
+    legacyBackupRaw = raw;
+    try {
+      if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, raw);
+      legacyBackupRaw = null;
+    } catch {
+      importWarning = '旧编辑稿已在当前页面保留，但本机空间不足，原稿备份暂未完成。请先导出当前编辑稿；备份完成前不会覆盖旧暂存。';
+    }
+  }
   function persistDraft() {
     clearTimeout(saveTimer);
     try {
+      if (legacyBackupRaw !== null) {
+        if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, legacyBackupRaw);
+        legacyBackupRaw = null;
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
       dirty = false; savingFailed = false;
       setStatus('已暂存到本机', 'saved');
@@ -288,6 +322,45 @@
       els.tabs.append(tab);
     });
   }
+  function matchesContactEmail(url, previousValues) {
+    if (typeof url !== 'string' || !/^mailto:/i.test(url)) return false;
+    try {
+      const address = decodeURIComponent(url.slice(7).split('?')[0]).trim().toLowerCase();
+      return previousValues.some(value => String(value || '').trim().toLowerCase() === address);
+    } catch { return false; }
+  }
+  function syncContactValue(key, value, sourceInput) {
+    if (!['email', 'wechat'].includes(key)) return;
+    const oldSiteValue = draft.site[key] || '';
+    const contacts = draft.pages.filter(page => page.id === 'contact').flatMap(page => page.sections || []).flatMap(section => section.items || []).filter(item => item.id === key);
+    draft.site[key] = value;
+    contacts.forEach(item => {
+      const oldText = item.text || '';
+      const previousValues = [oldSiteValue, oldText];
+      item.text = value;
+      if (key === 'email') {
+        const updateMailto = previous => {
+          if (!value.trim()) return '';
+          const queryAt = typeof previous === 'string' ? previous.indexOf('?') : -1;
+          return `mailto:${value.trim()}${queryAt >= 0 ? previous.slice(queryAt) : ''}`;
+        };
+        if (!item.url || matchesContactEmail(item.url, previousValues)) item.url = updateMailto(item.url);
+        (item.links || []).forEach(link => {
+          if (matchesContactEmail(link.url, previousValues)) link.url = updateMailto(link.url);
+        });
+      } else if (previousValues.some(previous => item.details === `微信号：${previous}` || item.details === `微信号: ${previous}`)) {
+        item.details = value ? `微信号：${value}` : '';
+      }
+    });
+    document.querySelectorAll(`[data-contact-field="${key}"]`).forEach(input => { if (input !== sourceInput) input.value = value; });
+    if (key === 'email') {
+      const item = contacts[0];
+      if (item) {
+        document.querySelectorAll('[data-contact-url="email"]').forEach(input => { input.value = item.url || ''; });
+        document.querySelectorAll('[data-contact-proof="email"]').forEach(input => { input.value = item.links?.[Number(input.dataset.linkIndex)]?.url || ''; });
+      }
+    }
+  }
   function renderPageSettings() {
     const page = currentPage();
     els.settings.replaceChildren();
@@ -319,7 +392,13 @@
     background.body.append(overlay);
     const siteGroup = group('网站基本信息', '姓名、简介与联系方式', false);
     [['name', '姓名'], ['tagline', '个人简介'], ['email', '联系邮箱'], ['wechat', '微信号']].forEach(([key, label]) => {
-      siteGroup.body.append(field(label, draft.site[key], value => { draft.site[key] = value; changed(); }, { multiline: key === 'tagline', rows: 2 }));
+      const basicField = field(label, draft.site[key], (value, input) => {
+        if (key === 'email' || key === 'wechat') syncContactValue(key, value, input);
+        else draft.site[key] = value;
+        changed();
+      }, { multiline: key === 'tagline', rows: 2 });
+      if (key === 'email' || key === 'wechat') basicField.querySelector('input').dataset.contactField = key;
+      siteGroup.body.append(basicField);
     });
     els.settings.append(pageGroup.details, background.details);
     if (page.id === 'home') {
@@ -390,7 +469,7 @@
     const section = currentSection(); if (!section) return;
     const itemCount = draft.pages.reduce((total, page) => total + page.sections.reduce((sum, block) => sum + block.items.length, 0), 0);
     if (itemCount >= 500) { showToast('编辑稿最多支持 500 个内容条目。'); return; }
-    const item = { id: id('item'), title: '', text: '', url: '', image: '', meta: '', details: '', steps: [] };
+    const item = { id: id('item'), title: '', text: '', url: '', image: '', meta: '', details: '', role: '', industry: '', period: '', links: [], steps: [] };
     section.items.push(item); changed(); renderSectionList(); renderSectionEditor(item.id);
     requestAnimationFrame(() => {
       const input = els.sectionEditor.querySelector(`[data-item-id="${item.id}"] input`);
@@ -429,6 +508,32 @@
     }));
     body.append(metricGroup.details);
   }
+  function renderLinks(item, body, kind) {
+    const linkGroup = group('关联作品与证明链接', '可填写多个链接；留空可保留位置', ['capability', 'workflow', 'links'].includes(kind));
+    const list = node('div', 'proof-links-editor');
+    const redraw = () => {
+      list.replaceChildren();
+      if (!(item.links || []).length) list.append(node('p', 'proof-links-empty', '把作品、账号、视频或文档放在这里。'));
+      (item.links || []).forEach((link, index) => {
+        const row = node('div', 'proof-link-row');
+        row.append(node('span', 'proof-link-index', `链接 ${String(index + 1).padStart(2, '0')}`));
+        const targetField = field('目标地址', link.url, value => { link.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '可以先留空，之后再补链接。' });
+        if (currentPage().id === 'contact' && item.id === 'email') {
+          const input = targetField.querySelector('input'); input.dataset.contactProof = 'email'; input.dataset.linkIndex = String(index);
+        }
+        row.append(field('链接文字', link.label, value => { link.label = value; changed(); }, { placeholder: '如：查看视频 / 作品说明' }), targetField);
+        row.append(button('×', 'icon-button delete-button proof-link-remove', () => { item.links.splice(index, 1); changed(); redraw(); }, `删除关联链接 ${index + 1}`));
+        list.append(row);
+      });
+    };
+    redraw();
+    linkGroup.body.append(list, button('＋ 添加关联链接', 'button-quiet add-proof-link', () => {
+      item.links ||= [];
+      if (item.links.length >= 30) { showToast('每个条目最多支持 30 个关联链接。'); return; }
+      item.links.push({ label: '', url: '' }); changed(); redraw();
+    }));
+    body.append(linkGroup.details);
+  }
   function renderSectionEditor(openItemId = '') {
     const editingPageId = currentPage().id;
     const section = currentSection();
@@ -466,11 +571,28 @@
       toolbar.append(up, down, button('删除', 'button-quiet danger-text', () => removeItem(item.id), `删除条目 ${index + 1}`));
       const itemLabel = section.kind === 'companies' ? '公司 / 项目名称' : section.kind === 'photo' ? '照片标题' : '标题';
       body.append(toolbar,
-        field(itemLabel, item.title, value => { item.title = value; summaryTitle.textContent = value || `未命名条目 ${index + 1}`; changed(); }),
-        field(section.kind === 'companies' ? '时间 / 职位' : '标签 / 时间 / 备注', item.meta, value => { item.meta = value; changed(); }, { placeholder: section.kind === 'companies' ? '2026.07 — 至今 · 英语 SEO 运营' : '可选' }),
-        field(section.kind === 'photo' ? '照片说明' : '简短介绍', item.text, value => { item.text = value; changed(); }, { multiline: true, rows: 3 }),
-        field(section.kind === 'videos' ? '视频链接' : '跳转链接', item.url, value => { item.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '留空时不显示外部跳转。' })
+        field(itemLabel, item.title, value => { item.title = value; summaryTitle.textContent = value || `未命名条目 ${index + 1}`; changed(); })
       );
+      if (section.kind === 'companies') {
+        const companyFields = node('div', 'company-fields');
+        companyFields.append(field('职位', item.role, value => { item.role = value; changed(); }, { placeholder: '如：英语 SEO 运营' }),
+          field('行业', item.industry, value => { item.industry = value; changed(); }, { placeholder: '如：软件出海' }),
+          field('时间', item.period, value => { item.period = value; changed(); }, { placeholder: '如：2026.07 — 至今' }));
+        body.append(companyFields);
+      }
+      const contactKey = editingPageId === 'contact' && ['email', 'wechat'].includes(item.id) ? item.id : '';
+      const descriptionField = field(contactKey === 'email' ? '邮箱地址' : contactKey === 'wechat' ? '微信号' : section.kind === 'photo' ? '照片说明' : '简短介绍', item.text, (value, input) => {
+        if (contactKey) syncContactValue(contactKey, value, input); else item.text = value;
+        changed();
+      }, { multiline: !contactKey, rows: 3 });
+      if (contactKey) descriptionField.querySelector('input').dataset.contactField = contactKey;
+      const urlField = field(section.kind === 'videos' ? '视频链接' : '跳转链接', item.url, value => { item.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '留空时不显示外部跳转。' });
+      if (contactKey === 'email') urlField.querySelector('input').dataset.contactUrl = 'email';
+      body.append(
+        field(section.kind === 'companies' ? '补充标签 / 备注' : '标签 / 时间 / 备注', item.meta, value => { item.meta = value; changed(); }, { placeholder: '可选' }),
+        descriptionField, urlField
+      );
+      renderLinks(item, body, section.kind);
       const imageGroup = group(section.kind === 'companies' ? '公司图片 / 标志' : section.kind === 'videos' ? '视频封面' : '照片 / 封面', item.image ? '已加入图片' : '未添加图片', section.kind === 'photo');
       imageGroup.body.append(imageControl(item.image, value => {
         const target = draft.pages.find(p => p.id === editingPageId)?.sections.find(s => s.id === section.id)?.items.find(i => i.id === item.id);
@@ -521,8 +643,14 @@
     draft = normalizeDraft(clone(window.websiteDefaults));
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) { draft = normalizeDraft(JSON.parse(saved)); setStatus('已打开本机编辑稿', 'saved'); }
-      else setStatus('初稿已就绪', 'saved');
+      if (saved) {
+        let parsed;
+        try { parsed = JSON.parse(saved); }
+        catch (error) { backupLegacyDraft(saved, null); throw error; }
+        backupLegacyDraft(saved, parsed);
+        draft = normalizeDraft(parsed);
+        setStatus(legacyBackupRaw !== null ? '原稿备份待完成，请先导出' : '已打开本机编辑稿', legacyBackupRaw !== null ? 'warning' : 'saved');
+      } else setStatus('初稿已就绪', 'saved');
     } catch {
       importWarning = '本机旧编辑稿暂时无法读取，已打开初稿。原暂存尚未覆盖；可先导出当前内容再修改。';
       setStatus('已打开初稿，请检查内容', 'warning');
@@ -533,6 +661,7 @@
     return;
   }
   selectInitialSection(); render();
+  if (editorParams.get('section') && selectedSectionId === editorParams.get('section')) scrollToInspector();
   if (importWarning) showToast(importWarning, true);
   els.add.addEventListener('click', () => { addPickerOpen = !addPickerOpen; renderAddPicker(); });
   $('#export-draft').addEventListener('click', exportDraft);
