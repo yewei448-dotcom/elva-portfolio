@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  const textFor = (zh, en) => window.WebsiteLanguage?.getLanguage() === 'en' ? en : zh;
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
     if (cls) node.className = cls;
@@ -25,7 +26,10 @@
   }
   function link(url, label, cls = '') {
     const a = el('a', cls, label);
-    a.href = url;
+    if (/^editor\.html(?:\?|$)/.test(url)) {
+      const target = new URL(url, location.href); target.searchParams.set('lang', window.WebsiteLanguage?.getLanguage() || 'zh');
+      a.href = `editor.html${target.search}`;
+    } else a.href = url;
     if (/^https?:/i.test(url)) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
     return a;
   }
@@ -55,9 +59,9 @@
   }
   function uniqueLinks(item) {
     const source = Array.isArray(item.links) ? item.links : [];
-    const valid = source.map(x => ({ label: x.label || '查看作品', url: safeUrl(x.url) })).filter(x => x.url);
+    const valid = source.map(x => ({ label: x.label || textFor('查看作品', 'View work'), url: safeUrl(x.url) })).filter(x => x.url);
     const primary = safeUrl(item.url);
-    if (primary && !valid.some(x => x.url === primary)) valid.push({ label: '查看作品', url: primary });
+    if (primary && !valid.some(x => x.url === primary)) valid.push({ label: textFor('查看作品', 'View work'), url: primary });
     const seen = new Set();
     return valid.filter(x => { if (seen.has(x.url)) return false; seen.add(x.url); return true; });
   }
@@ -67,7 +71,7 @@
     if (!links.length && !hasSlots) return null;
     const details = el('details', 'proof-fold');
     const summary = el('summary');
-    summary.append(el('span', '', compact ? '链接与演示' : '代表作品 / 合作'), el('span', 'fold-plus', '+'));
+    summary.append(el('span', '', compact ? textFor('链接与演示', 'Links & demos') : textFor('代表作品 / 合作', 'Selected work / collaborations')), el('span', 'fold-plus', '+'));
     const body = el('div', 'proof-links');
     links.forEach(x => {
       const a = link(x.url, '', 'proof-link');
@@ -75,8 +79,8 @@
     });
     if (!links.length) {
       if (document.body.dataset.draftContext === 'true') {
-        body.append(link('editor.html?page=capability', '添加作品链接 ↗', 'proof-link'));
-      } else body.append(el('span', 'proof-pending', '作品待补充'));
+        body.append(link('editor.html?page=capability', textFor('添加作品链接 ↗', 'Add work links ↗'), 'proof-link'));
+      } else body.append(el('span', 'proof-pending', textFor('作品待补充', 'Work to be added')));
     }
     details.append(summary, body); return details;
   }
@@ -185,16 +189,16 @@
     if (src) cover.append(image(src, item.title || '作品封面', 'piece-image'));
     else {
       const placeholder = el('span', 'piece-placeholder');
-      placeholder.append(el('span', '', String(index + 1).padStart(2, '0')), el('small', '', '封面待补充'));
+      placeholder.append(el('span', '', String(index + 1).padStart(2, '0')), el('small', '', textFor('封面待补充', 'Add a cover')));
       cover.append(placeholder);
     }
     const copy = el('span', 'piece-copy');
     if (item.meta) copy.append(el('span', 'piece-meta', item.meta));
-    copy.append(el('h4', '', item.title || '新作品'));
+    copy.append(el('h4', '', item.title || textFor('新作品', 'New work')));
     if (item.text) copy.append(el('span', 'piece-description', item.text));
     const highlight = item.metrics?.find(metric => metric.value);
     if (highlight) copy.append(el('span', 'piece-highlight', `${highlight.value} · ${highlight.label || '项目成果'}`));
-    const action = el('span', 'piece-action', '查看作品 +'); copy.append(action);
+    const action = el('span', 'piece-action', textFor('查看作品 +', 'View work +')); copy.append(action);
     summary.append(cover, copy);
     const body = el('div', 'piece-body');
     if (item.details) body.append(paragraphs(item.details));
@@ -205,9 +209,9 @@
     const proofs = uniqueLinks(item);
     const links = el('div', 'proof-links');
     proofs.forEach(proof => links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')));
-    if (!proofs.length) links.append(link(`editor.html?page=capability&section=${encodeURIComponent(sectionId)}`, '补充作品链接 ↗', 'proof-link'));
+    if (!proofs.length) links.append(link(`editor.html?page=capability&section=${encodeURIComponent(sectionId)}`, textFor('补充作品链接 ↗', 'Add work links ↗'), 'proof-link'));
     body.append(links); card.append(summary, body);
-    card.addEventListener('toggle', () => { action.textContent = card.open ? '收起作品 −' : '查看作品 +'; });
+    card.addEventListener('toggle', () => { action.textContent = card.open ? textFor('收起作品 −', 'Close work −') : textFor('查看作品 +', 'View work +'); });
     return card;
   }
   function portfolioSection(section, index = 0) {
@@ -217,7 +221,7 @@
     if (section.subtitle) heading.append(el('p', '', section.subtitle));
     const cards = el('div', 'work-cards');
     (section.items || []).forEach((item, i) => cards.append(portfolioPiece(item, i, section.id)));
-    if (!(section.items || []).length) cards.append(link(`editor.html?page=capability&section=${encodeURIComponent(section.id)}`, '添加第一件作品 ↗', 'section-edit-link'));
+    if (!(section.items || []).length) cards.append(link(`editor.html?page=capability&section=${encodeURIComponent(section.id)}`, textFor('添加第一件作品 ↗', 'Add your first work ↗'), 'section-edit-link'));
     block.append(heading, cards); return block;
   }
   function educationSection(section) {
@@ -227,7 +231,7 @@
       const top = el('div', 'education-topline');
       top.append(el('span', 'education-mark', String(index + 1).padStart(2, '0')), el('span', '', 'EDUCATION'));
       const copy = el('div', 'education-copy');
-      copy.append(el('h3', '', item.title || '学校名称'));
+      copy.append(el('h3', '', item.title || textFor('学校名称', 'University')));
       if (item.meta) copy.append(el('p', 'education-meta', item.meta));
       if (item.text) copy.append(paragraphs(item.text));
       if (item.details) copy.append(paragraphs(item.details, 'portfolio-copy education-detail'));
@@ -247,17 +251,17 @@
         if (src) frame.append(image(src, item.title || '生活照片', 'life-image'));
         else {
           const placeholder = link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, '', 'life-photo-placeholder');
-          placeholder.append(el('span', '', '+'), el('small', '', '放一张生活照片')); frame.append(placeholder);
+          placeholder.append(el('span', '', '+'), el('small', '', textFor('放一张生活照片', 'Add a photo'))); frame.append(placeholder);
         }
         figure.append(frame, el('figcaption', '', item.title || `MOMENT ${String(index + 1).padStart(2, '0')}`));
         if (item.text) figure.append(el('p', 'life-photo-note', item.text));
         group.append(figure);
       } else {
         const note = el('article', 'life-note');
-        note.append(el('h3', '', item.title || '写一点关于自己'));
+        note.append(el('h3', '', item.title || textFor('写一点关于自己', 'A little about me')));
         if (item.meta) note.append(el('p', 'piece-meta', item.meta));
         if (item.text || item.details) note.append(paragraphs([item.text, item.details].filter(Boolean).join('\n\n')));
-        else note.append(link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, '写点什么 ↗', 'section-edit-link'));
+        else note.append(link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, textFor('写点什么 ↗', 'Write something ↗'), 'section-edit-link'));
         uniqueLinks(item).forEach(proof => note.append(link(proof.url, `${proof.label} ↗`, 'section-edit-link')));
         group.append(note);
       }
@@ -272,38 +276,44 @@
       const item = (section.items || []).find(x => x.id === key);
       const value = Object.hasOwn(site, key) ? String(site[key] ?? '').trim() : String(item?.text || '').trim();
       if (!value) return;
-      const label = key === 'phone' ? `拨打电话 ${value}` : key === 'email' ? `发送邮件 ${value}` : `复制微信号 ${value}`;
+      const label = key === 'phone' ? textFor(`拨打电话 ${value}`, `Call ${value}`) : key === 'email' ? textFor(`发送邮件 ${value}`, `Email ${value}`) : textFor(`复制微信号 ${value}`, `Copy WeChat ID ${value}`);
       const url = key === 'phone' ? safeUrl(`tel:${value.replace(/[\s-]/g, '')}`) : key === 'email' ? safeUrl(`mailto:${value}`) : '';
       if (key !== 'wechat' && !url) return;
       const node = key === 'wechat' ? el('button', `portfolio-contact-icon contact-${key}`) : link(url, '', `portfolio-contact-icon contact-${key}`);
-      node.setAttribute('aria-label', label); node.title = label;
+      node.setAttribute('aria-label', label);
+      const wrap = el('span', `contact-icon-wrap contact-wrap-${key}`);
+      const tooltip = el('span', 'contact-tooltip'); tooltip.id = `contact-tooltip-${key}`; tooltip.setAttribute('role', 'tooltip');
+      tooltip.append(el('span', 'contact-tooltip-label', key === 'phone' ? textFor('电话', 'Phone') : key === 'email' ? textFor('邮箱', 'Email') : textFor('微信', 'WeChat')), el('span', 'contact-tooltip-value', value));
+      node.setAttribute('aria-describedby', tooltip.id);
       const icon = el('img'); icon.src = `assets/ui/${key === 'phone' ? 'phone' : key === 'email' ? 'email' : 'wechat'}.svg`;
       icon.alt = ''; icon.width = 25; icon.height = 25; node.append(icon);
       if (key === 'wechat') {
         node.type = 'button';
         node.addEventListener('click', async () => {
           clearTimeout(feedbackTimer);
-          try { await navigator.clipboard.writeText(value); feedback.textContent = '微信号已复制'; }
-          catch { feedback.textContent = `微信：${value}`; }
+          try { await navigator.clipboard.writeText(value); feedback.textContent = textFor('微信号已复制', 'WeChat ID copied'); }
+          catch { feedback.textContent = textFor(`微信：${value}`, `WeChat: ${value}`); }
           feedback.hidden = false; feedbackTimer = setTimeout(() => { feedback.hidden = true; }, 3500);
         });
       }
-      group.append(node);
+      wrap.append(node, tooltip); group.append(wrap);
     }); group.append(feedback); return group;
   }
   function contactScene(page, site = {}, options = {}) {
     const scene = el('div', 'contact-scene');
     const bar = el('div', 'contact-topbar');
     const links = page.sections?.find(s => s.kind === 'links') || { items: [] };
-    const back = link(options.onHome ? '#home' : '#top', '回到顶部 ↗', 'contact-back');
+    const back = link(options.onHome ? '#home' : '#top', textFor('回到顶部 ↗', 'Back to top ↗'), 'contact-back');
     if (options.onHome) back.addEventListener('click', event => { event.preventDefault(); options.onHome(); });
     bar.append(contacts(links, site), back);
     const message = el('div', 'contact-message');
-    message.append(el('h2', '', page.title || '一起做点\n值得被记住的事。'));
+    message.append(el('h2', '', page.title || textFor('一起做点\n值得被记住的事。', 'Let’s make\nsomething memorable.')));
     const footer = el('footer', 'contact-signature');
-    const edit = link('editor.html?page=contact', '编辑 ↗', 'contact-edit');
+    const edit = link('editor.html?page=contact', textFor('编辑 ↗', 'Edit ↗'), 'contact-edit');
     if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
-    footer.append(el('span', '', `${site.name || '叶薇'} / 个人网站`), edit, el('span', '', `© ${new Date().getFullYear()}`));
+    const education = link('#education', `${textFor('硕士', 'Master’s')} · ${options.educationName || '西南财经大学'} ↗`, 'education-contact-hint');
+    if (options.onEducation) education.addEventListener('click', event => { event.preventDefault(); options.onEducation(); });
+    footer.append(el('span', '', `${site.name || 'Elva'} / ${textFor('个人网站', 'Personal website')}`), education, edit, el('span', '', `© ${new Date().getFullYear()}`));
     scene.append(bar, message, footer); return scene;
   }
   window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, educationSection, lifeSection, contacts, contactScene, safeUrl };

@@ -1,20 +1,23 @@
 (() => {
   'use strict';
   const STORAGE_KEY = 'yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeEducationLife.v2';
+  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeLocalization.v3';
   const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '作品 / 案例分类' };
-  const PAGE_LABELS = { home: '首页', education: '学历', experience: 'Experience', capability: 'Portfolio', ai: 'AI应用', contact: '联系方式', building: '作品', life: '生活' };
-  const MAX_JSON_BYTES = 24 * 1024 * 1024;
+  const PAGE_LABELS = { home: '首页', education: '学历', experience: '经历', capability: '作品集', ai: 'AI应用', contact: '联系', building: '作品', life: '生活' };
+  const MAX_JSON_BYTES = 48 * 1024 * 1024;
   const $ = selector => document.querySelector(selector);
   const els = {
     sidebar: $('#editor-sidebar'), tabs: $('#page-tabs'), settings: $('#page-settings'),
     sectionList: $('#section-list'), sectionEditor: $('#section-editor'), add: $('#add-section'),
     status: $('#save-status'), iframe: $('#draft-preview'), label: $('#preview-page-label'),
-    input: $('#draft-import'), toast: $('#editor-toast')
+    input: $('#draft-import'), toast: $('#editor-toast'), language: $('#editor-language'), languageHint: $('#editor-language-hint')
   };
   const clone = value => JSON.parse(JSON.stringify(value));
-  let draft;
+  const languageApi = window.WebsiteLanguage;
+  let draftDocument, draft;
   const editorParams = new URLSearchParams(location.search);
+  let editingLanguage = ['zh', 'en'].includes(editorParams.get('lang')) ? editorParams.get('lang') : languageApi.getLanguage();
+  languageApi.setLanguage(editingLanguage, { persist: false });
   let pageId = editorParams.get('page') || 'experience';
   let selectedSectionId = editorParams.get('section') || '';
   let saveTimer, previewTimer, toastTimer;
@@ -91,13 +94,13 @@
     if (typeof value !== 'string' || !value.trim() || value.length > 150 || /[\u0000-\u001f]/.test(value)) throw new Error(`${label}缺少有效标识。`);
     return value;
   }
-  function normalizeDraft(value) {
-    if (typeof window.migrateWebsiteDraftPhotos === 'function') value = window.migrateWebsiteDraftPhotos(value);
+  function normalizeSingleDraft(value, language = 'zh') {
+    if (typeof window.migrateWebsiteDraftPhotos === 'function') value = window.migrateWebsiteDraftPhotos(value, { language });
     if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== 1 || !value.site || typeof value.site !== 'object' || Array.isArray(value.site)) throw new Error('这不是受支持的网站编辑稿（需要 schemaVersion: 1）。');
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
     if (value.structureVersion !== undefined) {
-      if (![1, 2, 3].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
+      if (![1, 2, 3, 4].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
       normalized.structureVersion = value.structureVersion;
     }
     for (const key of ['name', 'tagline', 'phone', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
@@ -175,14 +178,45 @@
     return normalized;
   }
 
+  function normalizeDraft(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('编辑稿格式不正确。');
+    const input = { ...value }; delete input.localizations;
+    const normalized = normalizeSingleDraft(input, 'zh');
+    if (value.localizations !== undefined) {
+      const locales = value.localizations;
+      if (!locales || typeof locales !== 'object' || Array.isArray(locales) || Object.keys(locales).some(key => key !== 'en')) throw new Error('本编辑稿仅支持 localizations.en 英文稿。');
+      if (Object.hasOwn(locales, 'en')) {
+        if (!locales.en || typeof locales.en !== 'object' || Array.isArray(locales.en) || Object.hasOwn(locales.en, 'localizations')) throw new Error('英文稿需要是独立完整稿，不能再嵌套 localizations。');
+        normalized.localizations = { en: normalizeSingleDraft(locales.en, 'en') };
+      }
+    }
+    return normalized;
+  }
+  function bindDraft() {
+    draftDocument.localizations ||= {};
+    if (!draftDocument.localizations.en) draftDocument.localizations.en = normalizeSingleDraft(languageApi.createEnglish(draftDocument), 'en');
+    draft = editingLanguage === 'en' ? draftDocument.localizations.en : draftDocument;
+  }
+  function selectEditingLanguage(nextLanguage) {
+    if (!['zh', 'en'].includes(nextLanguage)) return;
+    if (pendingImageJobs) { if (els.language) els.language.value = editingLanguage; showToast('图片正在处理中，请稍后切换语言。'); pushPreview(); return; }
+    if (nextLanguage === editingLanguage) return;
+    editingLanguage = nextLanguage;
+    languageApi.setLanguage(editingLanguage, { persist: false });
+    bindDraft(); selectedSectionId = ''; addPickerOpen = false; selectInitialSection();
+    const query = new URLSearchParams(location.search); query.set('lang', editingLanguage);
+    history.replaceState(null, '', `${location.pathname}?${query}${location.hash}`);
+    changed({ render: true }); pushPreview();
+  }
+
   function pushPreview() {
     clearTimeout(previewTimer);
     if (!els.iframe.contentWindow) return;
-    els.iframe.contentWindow.postMessage({ type: 'yewei-draft:update', draft, pageId }, location.origin);
+    els.iframe.contentWindow.postMessage({ type: 'yewei-draft:update', draft: languageApi.resolve(draftDocument, editingLanguage), pageId, language: editingLanguage }, location.origin);
   }
   function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(pushPreview, 120); }
   function backupLegacyDraft(raw, value) {
-    if (!raw || value?.structureVersion === 3) return;
+    if (!raw || value?.structureVersion === 4) return;
     legacyBackupRaw = raw;
     try {
       if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, raw);
@@ -198,7 +232,7 @@
         if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, legacyBackupRaw);
         legacyBackupRaw = null;
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(draftDocument));
       dirty = false; savingFailed = false;
       setStatus('已暂存到本机', 'saved');
     } catch {
@@ -321,7 +355,7 @@
   function renderTabs() {
     els.tabs.replaceChildren();
     draft.pages.forEach(page => {
-      const tab = button(PAGE_LABELS[page.id] || page.name || '页面', 'page-tab', () => selectPage(page.id));
+      const tab = button(page.name || PAGE_LABELS[page.id] || '页面', 'page-tab', () => selectPage(page.id));
       tab.dataset.pageId = page.id; tab.setAttribute('aria-pressed', String(page.id === pageId));
       if (page.id === pageId) tab.classList.add('selected');
       els.tabs.append(tab);
@@ -654,12 +688,16 @@
   }
   function render() {
     selectInitialSection(); renderTabs(); renderPageSettings(); renderSectionList(); renderAddPicker(); renderSectionEditor();
+    if (els.language) els.language.value = editingLanguage;
+    if (els.languageHint) els.languageHint.textContent = editingLanguage === 'en'
+      ? 'English 初稿已提供英文导航和标题；作品描述以中文为底稿，供你自行翻译。这里的修改只影响 English。'
+      : '正在编辑中文内容，English 单独保留。保存与导出会包含中英文完整编辑稿。';
     els.label.textContent = `${currentPage().name || PAGE_LABELS[pageId] || '当前页面'} · 实时预览`;
   }
   function exportDraft() {
     if (pendingImageJobs) { showToast('图片正在处理中，请稍后再导出。'); return; }
     try {
-      const validated = normalizeDraft(draft);
+      const validated = normalizeDraft(draftDocument);
       const blob = new Blob([JSON.stringify(validated, null, 2)], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = node('a'); link.href = url; link.download = 'yewei-website-draft.json'; document.body.append(link); link.click(); link.remove();
@@ -670,7 +708,7 @@
   }
 
   try {
-    draft = normalizeDraft(clone(window.websiteDefaults));
+    draftDocument = normalizeDraft(clone(window.websiteDefaults)); bindDraft();
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -678,7 +716,7 @@
         try { parsed = JSON.parse(saved); }
         catch (error) { backupLegacyDraft(saved, null); throw error; }
         backupLegacyDraft(saved, parsed);
-        draft = normalizeDraft(parsed);
+        draftDocument = normalizeDraft(parsed); bindDraft();
         setStatus(legacyBackupRaw !== null ? '原稿备份待完成，请先导出' : '已打开本机编辑稿', legacyBackupRaw !== null ? 'warning' : 'saved');
       } else setStatus('初稿已就绪', 'saved');
     } catch {
@@ -691,6 +729,7 @@
     return;
   }
   selectInitialSection(); render();
+  els.language?.addEventListener('change', () => selectEditingLanguage(els.language.value));
   if (editorParams.get('section') && selectedSectionId === editorParams.get('section')) scrollToInspector();
   if (importWarning) showToast(importWarning, true);
   els.add.addEventListener('click', () => { addPickerOpen = !addPickerOpen; renderAddPicker(); });
@@ -700,18 +739,24 @@
     const file = els.input.files?.[0]; if (!file) return;
     try {
       if (pendingImageJobs) throw new Error('请等图片处理完成后再导入。');
-      if (file.size > MAX_JSON_BYTES) throw new Error('编辑稿超过 24 MB，请先减少图片数量。');
+      if (file.size > MAX_JSON_BYTES) throw new Error('双语编辑稿超过 48 MB，请先减少图片数量。');
       const imported = normalizeDraft(JSON.parse(await file.text()));
-      if (!window.confirm('导入后会替换当前编辑稿。建议先导出当前版本，是否继续？')) return;
-      draft = imported; selectedSectionId = ''; addPickerOpen = false; selectInitialSection(); changed({ render: true }); persistDraft(); pushPreview();
+      if (!window.confirm('导入后会替换中英文完整编辑稿。建议先导出当前版本，是否继续？')) return;
+      draftDocument = imported; bindDraft(); selectedSectionId = ''; addPickerOpen = false; selectInitialSection(); changed({ render: true }); persistDraft(); pushPreview();
       showToast('编辑稿已导入，预览已更新。');
     } catch (error) { showToast(error instanceof SyntaxError ? '这个文件不是有效的 JSON 编辑稿。' : error.message || '导入失败，请检查文件。', true); }
     finally { els.input.value = ''; }
   });
   $('#reset-draft').addEventListener('click', () => {
     if (pendingImageJobs) { showToast('请等图片处理完成后再恢复初稿。'); return; }
-    if (!window.confirm('恢复到初稿会替换当前页面里的所有修改。请先导出需要保留的版本，是否继续？')) return;
-    draft = normalizeDraft(clone(window.websiteDefaults)); selectedSectionId = ''; addPickerOpen = false; selectInitialSection(); changed({ render: true }); persistDraft(); pushPreview(); showToast('已恢复初稿。');
+    if (!window.confirm('恢复当前语言初稿会替换该语言的修改，另一种语言会保留。请先导出需要保留的版本，是否继续？')) return;
+    if (editingLanguage === 'en') draftDocument.localizations.en = normalizeSingleDraft(languageApi.createEnglish(draftDocument), 'en');
+    else {
+      const english = draftDocument.localizations?.en;
+      draftDocument = normalizeSingleDraft(clone(window.websiteDefaults), 'zh');
+      if (english) draftDocument.localizations = { en: english };
+    }
+    bindDraft(); selectedSectionId = ''; addPickerOpen = false; selectInitialSection(); changed({ render: true }); persistDraft(); pushPreview(); showToast('已恢复当前语言初稿。');
   });
   const toggleSidebar = $('#toggle-sidebar');
   toggleSidebar.setAttribute('aria-expanded', 'true'); toggleSidebar.setAttribute('aria-controls', 'editor-sidebar');
@@ -729,6 +774,7 @@
   window.addEventListener('message', event => {
     if (event.origin !== location.origin || event.source !== els.iframe.contentWindow || !event.data || typeof event.data !== 'object') return;
     if (event.data.type === 'yewei-draft:ready') pushPreview();
+    if (event.data.type === 'yewei-draft:language') selectEditingLanguage(event.data.language);
     if (event.data.type === 'yewei-draft:page' && typeof event.data.pageId === 'string') {
       if (event.data.pageId !== pageId) selectPage(event.data.pageId);
     }

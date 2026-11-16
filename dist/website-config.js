@@ -1,7 +1,7 @@
-// 网站默认内容；学历信息核对个人简历第 1 页，未提供成绩或奖项。
+// 双语网站根稿；localizations.en 为独立完整英文稿，学历只默认展示硕士。
 window.websiteDefaults = {
   "schemaVersion": 1,
-  "structureVersion": 3,
+  "structureVersion": 4,
   "site": {
     "name": "叶薇",
     "tagline": "达人 · SEO · AI",
@@ -25,53 +25,8 @@ window.websiteDefaults = {
       "avatarImage": "assets/elva-ai-avatar.png"
     },
     {
-      "id": "education",
-      "name": "学历",
-      "title": "教育经历",
-      "subtitle": "",
-      "background": {
-        "color": "#fbfaf5",
-        "image": "",
-        "overlay": 0.12
-      },
-      "sections": [
-        {
-          "id": "education-schools",
-          "kind": "text",
-          "title": "",
-          "subtitle": "",
-          "items": [
-            {
-              "id": "swufe",
-              "title": "西南财经大学",
-              "text": "211 高校",
-              "url": "",
-              "image": "",
-              "meta": "硕士 / 英语口译 / 2024.09–2026.06",
-              "details": "",
-              "steps": [],
-              "metrics": [],
-              "links": []
-            },
-            {
-              "id": "tjfsu",
-              "title": "天津外国语大学滨海外事学院",
-              "text": "",
-              "url": "",
-              "image": "",
-              "meta": "本科 / 翻译 / 2019.09–2023.06",
-              "details": "",
-              "steps": [],
-              "metrics": [],
-              "links": []
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "experience",
-      "name": "Experience",
+      "name": "经历",
       "title": "工作经历",
       "subtitle": "公司 / 职位 / 行业",
       "background": {
@@ -232,7 +187,7 @@ window.websiteDefaults = {
     },
     {
       "id": "capability",
-      "name": "Portfolio",
+      "name": "作品集",
       "title": "作品集",
       "subtitle": "案例、内容与合作。",
       "background": {
@@ -637,8 +592,41 @@ window.websiteDefaults = {
       ]
     },
     {
+      "id": "education",
+      "name": "学历",
+      "title": "教育经历",
+      "subtitle": "",
+      "background": {
+        "color": "#fbfaf5",
+        "image": "",
+        "overlay": 0.12
+      },
+      "sections": [
+        {
+          "id": "education-schools",
+          "kind": "text",
+          "title": "",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "swufe",
+              "title": "西南财经大学",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "contact",
-      "name": "联系方式",
+      "name": "联系",
       "title": "一起做点\n值得被记住的事。",
       "subtitle": "",
       "background": {
@@ -919,7 +907,7 @@ function migrateLegacyWebsiteDraft(value) {
 
 
 // v3 增加学历、生活与头像，保留用户自定义条目和链接。
-window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
+function migrateWebsiteDraftV3(value) {
   if (!value || value.schemaVersion!==1 || !Array.isArray(value.pages)) return value;
   // v3 已由用户编辑的内容不再套用历史默认值；更高版本交由归一化器提示。
   if (Number(value.structureVersion)>=3) return value;
@@ -1029,5 +1017,41 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
   if(!own(portfolio,'name')||['Capability','运营能力','作品'].includes(portfolio.name))portfolio.name=portfolioDefaults.name;
   if(!own(portfolio,'title')||['运营能力','Capability','能力与作品'].includes(portfolio.title))portfolio.title=portfolioDefaults.title;
   if(!own(portfolio,'subtitle')||['达人、社媒与搜索，分别做过什么。','爆款内容 / 品牌账号 / 搜索增长','我的内容、作品、代码和自动化流程。'].includes(portfolio.subtitle))portfolio.subtitle=portfolioDefaults.subtitle;
+  return next;
+};
+
+
+// v4 调整页面顺序与默认学历，不覆盖自定义内容或英文稿。
+window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{language='zh'}={}) {
+  if(!value||value.schemaVersion!==1||!Array.isArray(value.pages))return value;
+  if(Number(value.structureVersion)>=4)return value;
+  const clone=object=>JSON.parse(JSON.stringify(object));
+  const next=clone(migrateWebsiteDraftV3(value));next.structureVersion=4;
+  const defaults=window.websiteDefaults;
+  const order=['home','experience','capability','ai','life','education','contact'];
+  order.forEach(id=>{if(!next.pages.some(page=>page.id===id))next.pages.push(clone(defaults.pages.find(page=>page.id===id)));});
+  next.pages=[...order.map(id=>next.pages.find(page=>page.id===id)),...next.pages.filter(page=>!order.includes(page.id))];
+  if(language!=='en'){
+    const previousNames={home:['首页'],experience:['Experience','工作经历'],capability:['Portfolio','Capability','运营能力'],ai:['AI应用','AI 工具'],life:['生活'],education:['学历'],contact:['联系方式','联系我']};
+    next.pages.forEach(page=>{if((previousNames[page.id]||[]).includes(page.name))page.name=defaults.pages.find(item=>item.id===page.id)?.name||page.name;});
+  }
+  const isEmpty=value=>value===undefined||value===null||value===''||(Array.isArray(value)&&value.length===0);
+  function defaultBachelor(item){
+    if(!item||item.id!=='tjfsu')return false;
+    const current=item.title==='天津外国语大学滨海外事学院'&&item.meta==='本科 / 翻译 / 2019.09–2023.06'&&isEmpty(item.text);
+    const earlier=item.title==='天津外国语大学滨海外事学院 · 翻译本科'&&['2019.09 — 2023.06','2019.09-2023.06'].includes(item.text)&&isEmpty(item.meta);
+    if(!current&&!earlier)return false;
+    return Object.keys(item).every(key=>['id','title','meta','text'].includes(key)||isEmpty(item[key]));
+  }
+  const education=next.pages.find(page=>page.id==='education');
+  (education.sections||[]).forEach(section=>{
+    if(!Array.isArray(section.items))return;
+    section.items=section.items.filter(item=>!defaultBachelor(item));
+    section.items.forEach(item=>{
+      if(item.id!=='swufe'||item.title!=='西南财经大学')return;
+      if(item.meta==='硕士 / 英语口译 / 2024.09–2026.06')item.meta='';
+      if(item.text==='211 高校')item.text='';
+    });
+  });
   return next;
 };

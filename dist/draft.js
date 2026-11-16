@@ -1,21 +1,24 @@
 (() => {
   'use strict';
   const STORAGE_KEY='yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeEducationLife.v2';
+  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeLocalization.v3';
   document.body.dataset.draftContext='true';
   const params=new URLSearchParams(location.search);
   const embedded=params.get('editor')==='1'&&parent!==window;
   const migratePhotos=value=>typeof window.migrateWebsiteDraftPhotos==='function'?window.migrateWebsiteDraftPhotos(value):value;
-  let draft=migratePhotos(structuredClone(window.websiteDefaults));
+  let sourceDraft=migratePhotos(structuredClone(window.websiteDefaults));
+  let language=window.WebsiteLanguage?.getLanguage()||'zh';
+  const textFor=(zh,en)=>language==='en'?en:zh;
+  let draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;
   let pageId=params.get('page')||location.hash.slice(1)||'experience';
   function readCachedDraft(raw){
     if(!raw)return null;
     let cached;
     try{cached=JSON.parse(raw);}catch{try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}return null;}
-    if(cached?.structureVersion!==3){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
+    if(cached?.structureVersion!==4){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
     return cached?.schemaVersion===1&&Array.isArray(cached.pages)?migratePhotos(cached):null;
   }
-  if(!embedded){try{const cached=readCachedDraft(localStorage.getItem(STORAGE_KEY));if(cached)draft=cached;}catch{}}
+  if(!embedded){try{const cached=readCachedDraft(localStorage.getItem(STORAGE_KEY));if(cached){sourceDraft=cached;draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;}}catch{}}
   const app=document.querySelector('#draft-app');
   const dialog=document.querySelector('#detail-dialog');
   const detailContent=document.querySelector('#detail-content');
@@ -91,6 +94,7 @@
     if(!draft.pages.some(p=>p.id===pageId))pageId=draft.pages[0]?.id||'home';
     const page=draft.pages.find(p=>p.id===pageId);if(!page)return;
     document.body.dataset.page=page.id;
+    window.WebsiteLanguage?.setLanguage(language,{persist:false});document.documentElement.lang=language==='en'?'en':'zh-CN';
     const previousPage=app.dataset.page;const previousScroll=scrollY;
     if(previousPage&&previousPage!==page.id&&dialog.open)dialog.close();
     app.dataset.page=page.id;app.replaceChildren();
@@ -101,19 +105,26 @@
     document.title=`${draft.site?.name||'我的网站'} · ${page.name||'预览'}`;
     const header=el('header','draft-header');const logo=el('a','draft-logo','Elva✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
     const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');draft.pages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
-    header.append(logo,nav);app.append(header);
+    const languageButton=el('button','language-toggle',language==='en'?'中':'EN');languageButton.type='button';languageButton.setAttribute('aria-label',textFor('切换为英文','Switch to Chinese'));
+    languageButton.addEventListener('click',()=>{
+      const next=language==='en'?'zh':'en';
+      if(embedded){send({type:'yewei-draft:language',language:next});return;}
+      language=next;window.WebsiteLanguage?.setLanguage(language);const url=new URL(location.href);url.searchParams.set('lang',language);history.replaceState(null,'',url);draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;render();
+    });
+    header.append(logo,nav,languageButton);app.append(header);
     const main=el('main','draft-main');
     if(page.id==='contact'&&typeof window.PortfolioUI?.contactScene==='function'){
       main.classList.add('contact-preview-main');
-      main.append(window.PortfolioUI.contactScene(page,draft.site,{onHome:()=>goToPage('home'),onEdit:embedded?()=>send({type:'yewei-draft:select',sectionId:page.sections[0]?.id,pageId:page.id}):null}));app.append(main);
-      if(!embedded){const edit=el('a','standalone-edit','返回可视化编辑器 ↗');edit.href='editor.html?page=contact';app.append(edit);}
+      const educationName=draft.pages.find(p=>p.id==='education')?.sections?.flatMap(s=>s.items||[])[0]?.title;
+      main.append(window.PortfolioUI.contactScene(page,draft.site,{educationName,onHome:()=>goToPage('home'),onEducation:()=>goToPage('education'),onEdit:embedded?()=>send({type:'yewei-draft:select',sectionId:page.sections[0]?.id,pageId:page.id}):null}));app.append(main);
+      if(!embedded){const edit=el('a','standalone-edit',textFor('返回可视化编辑器 ↗','Back to editor ↗'));edit.href=`editor.html?page=contact&lang=${language}`;app.append(edit);}
       return;
     }
     const hero=el('div','page-intro');
     const portraitImage=page.id==='home'?safeUrl(page.portraitImage,true):'';
     const intro=portraitImage?el('div','home-intro-copy'):hero;
     if(page.id==='home'&&safeUrl(page.avatarImage,true)){
-      const status=el('div','draft-home-avatar');status.append(imageNode(safeUrl(page.avatarImage,true),'Elva AI 插画头像'),el('span','','个人空间'));intro.append(status);
+      const status=el('div','draft-home-avatar');status.append(imageNode(safeUrl(page.avatarImage,true),'Elva AI avatar'),el('span','',textFor('个人空间','Personal space')));intro.append(status);
     }
     const introTitle=el('h1','',page.title||page.name);
     if(page.id==='home'){
@@ -142,7 +153,7 @@
       block.classList.add('draft-section',`block-${section.kind||'text'}`);block.dataset.sectionId=section.id;block.id=section.id;
       if(embedded){
         const select=()=>send({type:'yewei-draft:select',sectionId:section.id,pageId:page.id});
-        const edit=el('button','edit-section','编辑此板块');edit.type='button';edit.addEventListener('click',event=>{event.stopPropagation();select();});
+        const edit=el('button','edit-section',textFor('编辑此板块','Edit section'));edit.type='button';edit.addEventListener('click',event=>{event.stopPropagation();select();});
         const summary=sharedCapability?block.querySelector('summary'):null;
         if(summary)summary.append(edit);else block.append(edit);
         block.addEventListener('click',event=>{
@@ -163,12 +174,12 @@
       main.append(block);
     });app.append(main);
     const footer=el('footer','draft-footer');const info=el('div');info.append(el('strong','',draft.site?.name||'我的网站'),el('p','',draft.site?.tagline||''));const contact=el('div','footer-contact');
-    const email=String(draft.site?.email||'').replace(/[\r\n]/g,'');if(email){const a=el('a','',email+' ↗');a.href='mailto:'+encodeURIComponent(email);contact.append(a);}if(draft.site?.wechat)contact.append(el('span','','微信 / '+draft.site.wechat));footer.append(info,contact);if(bg.image==='assets/meadow.jpg')footer.append(el('small','background-credit','装饰背景：Adrien Olichon / Unsplash'));app.append(footer);
-    if(!embedded){const edit=el('a','standalone-edit','返回可视化编辑器 ↗');edit.href='editor.html';app.append(edit);}
+    const email=String(draft.site?.email||'').replace(/[\r\n]/g,'');if(email){const a=el('a','',email+' ↗');a.href='mailto:'+encodeURIComponent(email);contact.append(a);}if(draft.site?.wechat)contact.append(el('span','',textFor('微信 / ','WeChat / ')+draft.site.wechat));footer.append(info,contact);if(bg.image==='assets/meadow.jpg')footer.append(el('small','background-credit','装饰背景：Adrien Olichon / Unsplash'));app.append(footer);
+    if(!embedded){const edit=el('a','standalone-edit',textFor('返回可视化编辑器 ↗','Back to editor ↗'));edit.href=`editor.html?lang=${language}`;app.append(edit);}
     if(dialog.open&&activeDetailId){const updated=(page.sections||[]).flatMap(s=>s.items||[]).find(i=>i.id===activeDetailId);if(updated)showDetail(updated,activeDetailPhoto);else dialog.close();}
     if(previousPage===page.id&&previousScroll)requestAnimationFrame(()=>scrollTo({top:previousScroll,behavior:'instant'}));
   }
-  if(embedded){addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent)return;const message=event.data;if(message?.type!=='yewei-draft:update'||message.draft?.schemaVersion!==1||!Array.isArray(message.draft.pages))return;draft=migratePhotos(message.draft);if(message.pageId)pageId=message.pageId;render();});}
-  else addEventListener('storage',event=>{if(event.key!==STORAGE_KEY)return;try{const next=readCachedDraft(event.newValue);if(next){draft=next;render();}}catch{}});
+  if(embedded){addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent)return;const message=event.data;if(message?.type!=='yewei-draft:update'||message.draft?.schemaVersion!==1||!Array.isArray(message.draft.pages))return;language=message.language==='en'?'en':'zh';draft=migratePhotos(message.draft);if(message.pageId)pageId=message.pageId;render();});}
+  else addEventListener('storage',event=>{if(event.key!==STORAGE_KEY)return;try{const next=readCachedDraft(event.newValue);if(next){sourceDraft=next;draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;render();}}catch{}});
   render();send({type:'yewei-draft:ready'});
 })();

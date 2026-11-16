@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  const draft = window.websiteDefaults;
+  const language = window.WebsiteLanguage?.getLanguage() || 'zh';
+  const draft = window.WebsiteLanguage?.resolve(window.websiteDefaults, language) || window.websiteDefaults;
+  const copy = (zh, en) => language === 'en' ? en : zh;
   const ui = window.PortfolioUI;
   if (!draft || !ui) return;
   const el = (tag, cls, text) => {
@@ -20,8 +22,8 @@
     }
     block.append(renderItems(section)); return block;
   }
-  const pages = ['education', 'experience', 'capability', 'ai', 'life', 'contact'];
-  const labels = ['EDUCATION', 'EXPERIENCE', 'PORTFOLIO', 'AI APPLICATIONS', 'LIFE', 'CONTACT'];
+  const pages = ['experience', 'capability', 'ai', 'life', 'education', 'contact'];
+  const labels = ['EXPERIENCE', 'PORTFOLIO', 'AI APPLICATIONS', 'LIFE', 'EDUCATION', 'CONTACT'];
   pages.forEach((id, i) => {
     const page = draft.pages.find(x => x.id === id);
     if (!page) return;
@@ -35,7 +37,8 @@
       section.classList.toggle('has-photo', Boolean(image));
       section.style.backgroundColor = /^#[0-9a-f]{3,8}$/i.test(bg.color || '') ? bg.color : '#7094ac';
       section.style.backgroundImage = image ? `linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${Math.min(.8, overlay + .1)})),url(${JSON.stringify(image)})` : 'none';
-      shell.append(ui.contactScene(page, draft.site)); section.append(shell); main.append(section); return;
+      const educationName = draft.pages.find(page => page.id === 'education')?.sections?.flatMap(section => section.items || [])[0]?.title;
+      shell.append(ui.contactScene(page, draft.site, { educationName })); section.append(shell); main.append(section); return;
     }
     const heading = el('header', 'portfolio-heading');
     const title = el('div');
@@ -51,7 +54,7 @@
       shell.append(grid);
     } else if (id === 'capability') {
       const tools = el('div', 'portfolio-tools');
-      const edit = el('a', 'section-edit-link', '编辑作品集 ↗'); edit.href = 'editor.html?page=capability'; tools.append(edit); shell.append(tools);
+      const edit = el('a', 'section-edit-link', copy('编辑作品集 ↗', 'Edit portfolio ↗')); edit.href = `editor.html?page=capability&lang=${language}`; tools.append(edit); shell.append(tools);
       const list = el('div', 'portfolio-gallery');
       page.sections.forEach((s, index) => list.append(ui.portfolioSection(s, index)));
       shell.append(list);
@@ -61,12 +64,35 @@
       shell.append(grid);
     } else if (id === 'life') {
       const tools = el('div', 'portfolio-tools');
-      const edit = el('a', 'section-edit-link', '编辑生活页 ↗'); edit.href = 'editor.html?page=life'; tools.append(edit); shell.append(tools);
+      const edit = el('a', 'section-edit-link', copy('编辑生活页 ↗', 'Edit life ↗')); edit.href = `editor.html?page=life&lang=${language}`; tools.append(edit); shell.append(tools);
       page.sections.forEach((s, index) => shell.append(journalBlock(s, index, ui.lifeSection)));
     }
     section.append(shell); main.append(section);
   });
   const home = draft.pages.find(x => x.id === 'home');
+  document.documentElement.lang = language === 'en' ? 'en' : 'zh-CN';
+  document.querySelectorAll('.desktop-nav a, #mobile-menu a, .dock-item').forEach(anchor => {
+    const page = draft.pages.find(page => `#${page.id}` === anchor.hash);
+    if (!page) return;
+    if (anchor.classList.contains('dock-item')) anchor.querySelector('.dock-tooltip').textContent = page.name;
+    else anchor.textContent = page.name;
+    anchor.setAttribute('aria-label', page.name);
+  });
+  const languageButton = document.querySelector('.language-toggle');
+  languageButton.textContent = language === 'en' ? '中' : 'EN';
+  languageButton.setAttribute('aria-label', copy('切换为英文', 'Switch to Chinese'));
+  languageButton.addEventListener('click', () => {
+    const next = language === 'en' ? 'zh' : 'en';
+    window.WebsiteLanguage?.setLanguage(next);
+    const url = new URL(location.href); url.searchParams.set('lang', next); history.replaceState(null, '', url); location.reload();
+  });
+  document.querySelector('.hero-status > span:last-child').textContent = copy(`${draft.site.name}的个人空间`, `${draft.site.name}'s space`);
+  document.querySelector('.hero-button').firstChild.textContent = copy('往下逛逛 ', 'Explore ');
+  document.querySelector('.hero-foot > span').textContent = home?.subtitle || draft.site.tagline;
+  document.querySelector('.skip-link').textContent = copy('跳到主要内容', 'Skip to content');
+  document.querySelector('.desktop-nav').setAttribute('aria-label', copy('主导航', 'Main navigation'));
+  document.querySelector('.logo').setAttribute('aria-label', copy('Elva 首页', 'Elva home'));
+  document.querySelector('#portrait-card > img').alt = copy('Elva 在户外的个人照片', 'Elva outdoors');
   if (home?.subtitle) document.querySelector('.hero-intro').textContent = home.subtitle;
   if (home?.title) {
     const heading = document.querySelector('.hero h1');
@@ -105,7 +131,8 @@
     portrait.addEventListener('pointerup', release); portrait.addEventListener('pointercancel', release);
   }
   if ('IntersectionObserver' in window) {
-    const links = [...document.querySelectorAll('.dock-item')];
+    const links = [...document.querySelectorAll('.dock-item, .desktop-nav a')];
+    document.querySelector('.desktop-nav a')?.classList.add('is-active');
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       links.forEach(a => { const active = a.hash === `#${entry.target.id}`; a.classList.toggle('is-active', active); if (active) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
