@@ -11,11 +11,12 @@ window.websiteDefaults = {
     {
       "id": "home",
       "name": "首页",
+      "portraitImage": "assets/yewei-hanging-portrait.png",
       "title": "HELLO,\nI’M YE WEI.",
       "subtitle": "做内容，做出海营销，也会自己搭点工具。",
       "background": {
         "color": "#faf8ef",
-        "image": "assets/meadow.jpg",
+        "image": "assets/yewei-seaside-background.png",
         "overlay": 0.22
       },
       "sections": [
@@ -468,4 +469,23 @@ window.websiteDefaults = {
       ]
     }
   ]
+};
+
+// 兼容旧版编辑稿：只替换从未更改过的首页默认背景。
+// 主动移除的悬挂照片（空字符串）会保留，自定义背景不会被覆盖。
+window.migrateWebsiteDraftPhotos = function (value) {
+  if (!value || value.schemaVersion !== 1 || !Array.isArray(value.pages)) return value;
+  const home = value.pages.find(page => page && page.id === 'home');
+  const defaults = window.websiteDefaults.pages.find(page => page.id === 'home');
+  if (!home || !defaults) return value;
+  let nextHome = home;
+  const oldBackground = home.background;
+  if (oldBackground && oldBackground.image === 'assets/meadow.jpg' && oldBackground.color === '#faf8ef' && oldBackground.overlay === 0.22) {
+    nextHome = { ...nextHome, background: { ...oldBackground, image: defaults.background.image } };
+  }
+  if (!Object.prototype.hasOwnProperty.call(home, 'portraitImage')) {
+    nextHome = { ...nextHome, portraitImage: defaults.portraitImage };
+  }
+  if (nextHome === home) return value;
+  return { ...value, pages: value.pages.map(page => page === home ? nextHome : page) };
 };

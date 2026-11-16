@@ -84,6 +84,7 @@
     return value;
   }
   function normalizeDraft(value) {
+    if (typeof window.migrateWebsiteDraftPhotos === 'function') value = window.migrateWebsiteDraftPhotos(value);
     if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== 1 || !value.site || typeof value.site !== 'object' || Array.isArray(value.site)) throw new Error('这不是受支持的网站编辑稿（需要 schemaVersion: 1）。');
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
@@ -107,6 +108,11 @@
         subtitle: requireString(page.subtitle, '页面副标题', 5000),
         background: { color, image: bgImage, overlay: Number.isFinite(Number(bg.overlay)) ? Math.min(0.85, Math.max(0, Number(bg.overlay))) : 0.2 }, sections: []
       };
+      if (pid === 'home' || Object.prototype.hasOwnProperty.call(page, 'portraitImage')) {
+        const portraitImage = requireString(page.portraitImage, '悬挂照片', 12 * 1024 * 1024);
+        if (!safeUrl(portraitImage, true)) throw new Error('悬挂照片包含不支持的图片地址。');
+        np.portraitImage = portraitImage;
+      }
       const sectionIds = new Set();
       for (const section of page.sections) {
         if (!section || typeof section !== 'object' || Array.isArray(section) || !Object.hasOwn(KINDS, section.kind) || !Array.isArray(section.items)) throw new Error('板块类型或内容格式不正确。');
@@ -244,7 +250,7 @@
     const wrapper = node('div', 'image-control');
     if (value) {
       const preview = node('div', 'image-control-preview');
-      const image = node('img'); image.src = value; image.alt = options.background ? '当前页面背景' : '当前条目图片';
+      const image = node('img'); image.src = value; image.alt = options.background ? '当前页面背景' : options.portrait ? '当前悬挂照片' : '当前条目图片';
       image.addEventListener('error', () => { preview.classList.add('image-error'); image.hidden = true; preview.append(node('span', '', '图片暂时无法显示')); }, { once: true });
       preview.append(image); wrapper.append(preview);
     }
@@ -315,7 +321,17 @@
     [['name', '姓名'], ['tagline', '个人简介'], ['email', '联系邮箱'], ['wechat', '微信号']].forEach(([key, label]) => {
       siteGroup.body.append(field(label, draft.site[key], value => { draft.site[key] = value; changed(); }, { multiline: key === 'tagline', rows: 2 }));
     });
-    els.settings.append(pageGroup.details, background.details, siteGroup.details);
+    els.settings.append(pageGroup.details, background.details);
+    if (page.id === 'home') {
+      const portrait = group('悬挂照片', page.portraitImage ? '首页右侧的个人照片' : '已隐藏，可重新上传', true);
+      portrait.body.append(imageControl(page.portraitImage || '', value => {
+        const target = draft.pages.find(p => p.id === page.id); if (!target) return;
+        target.portraitImage = value; changed({ render: true });
+      }, { portrait: true }));
+      portrait.body.append(node('small', 'field-hint', '仅显示在首页；移除后保留页面背景。'));
+      els.settings.append(portrait.details);
+    }
+    els.settings.append(siteGroup.details);
   }
   function moveSection(sectionId, direction) {
     const sections = currentPage().sections;

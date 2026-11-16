@@ -3,9 +3,10 @@
   const STORAGE_KEY='yewei.visualDraft.v1';
   const params=new URLSearchParams(location.search);
   const embedded=params.get('editor')==='1'&&parent!==window;
-  let draft=structuredClone(window.websiteDefaults);
+  const migratePhotos=value=>typeof window.migrateWebsiteDraftPhotos==='function'?window.migrateWebsiteDraftPhotos(value):value;
+  let draft=migratePhotos(structuredClone(window.websiteDefaults));
   let pageId=params.get('page')||location.hash.slice(1)||'experience';
-  if(!embedded){try{const cached=JSON.parse(localStorage.getItem(STORAGE_KEY));if(cached?.schemaVersion===1&&Array.isArray(cached.pages))draft=cached;}catch{}}
+  if(!embedded){try{const cached=JSON.parse(localStorage.getItem(STORAGE_KEY));if(cached?.schemaVersion===1&&Array.isArray(cached.pages))draft=migratePhotos(cached);}catch{}}
   const app=document.querySelector('#draft-app');
   const dialog=document.querySelector('#detail-dialog');
   const detailContent=document.querySelector('#detail-content');
@@ -80,7 +81,22 @@
     const header=el('header','draft-header');const logo=el('a','draft-logo','yw✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
     const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');draft.pages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
     header.append(logo,nav);app.append(header);
-    const main=el('main','draft-main');const hero=el('div','page-intro');hero.append(el('span','page-eyebrow',`${String(draft.pages.indexOf(page)+1).padStart(2,'0')} / ${page.name||page.id}`),el('h1','',page.title||page.name),el('p','page-subtitle',page.subtitle||''));main.append(hero);
+    const main=el('main','draft-main');const hero=el('div','page-intro');
+    const portraitImage=page.id==='home'?safeUrl(page.portraitImage,true):'';
+    const intro=portraitImage?el('div','home-intro-copy'):hero;
+    intro.append(el('span','page-eyebrow',`${String(draft.pages.indexOf(page)+1).padStart(2,'0')} / ${page.name||page.id}`),el('h1','',page.title||page.name),el('p','page-subtitle',page.subtitle||''));
+    if(portraitImage){
+      hero.classList.add('home-intro');hero.append(intro);
+      const hanging=el('figure','home-hanging-photo');
+      const rope=el('span','home-photo-rope');rope.setAttribute('aria-hidden','true');
+      const clip=el('span','home-photo-clip');clip.setAttribute('aria-hidden','true');
+      const card=el('div','home-hanging-card');
+      const hole=el('span','home-photo-hole');hole.setAttribute('aria-hidden','true');
+      const image=el('img');image.src=portraitImage;image.alt=`${draft.site?.name||'我'}的个人照片`;image.decoding='async';
+      const caption=el('div','home-photo-caption');caption.append(el('strong','',draft.site?.name||'我'),el('span','','PERSONAL SPACE'),el('i','','✿'));
+      card.append(hole,image,caption);hanging.append(rope,clip,card);hero.append(hanging);
+    }
+    main.append(hero);
     (page.sections||[]).slice(0,100).forEach((section,index)=>{
       const block=el('section',`draft-section block-${section.kind||'text'}`);block.dataset.sectionId=section.id;block.id=section.id;
       if(embedded){const edit=el('button','edit-section','编辑此板块');edit.type='button';edit.addEventListener('click',()=>send({type:'yewei-draft:select',sectionId:section.id}));block.append(edit);block.addEventListener('click',()=>send({type:'yewei-draft:select',sectionId:section.id}));}
@@ -93,7 +109,7 @@
     if(dialog.open&&activeDetailId){const updated=(page.sections||[]).flatMap(s=>s.items||[]).find(i=>i.id===activeDetailId);if(updated)showDetail(updated,activeDetailPhoto);else dialog.close();}
     if(previousPage===page.id&&previousScroll)requestAnimationFrame(()=>scrollTo({top:previousScroll,behavior:'instant'}));
   }
-  if(embedded){addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent)return;const message=event.data;if(message?.type!=='yewei-draft:update'||message.draft?.schemaVersion!==1||!Array.isArray(message.draft.pages))return;draft=message.draft;if(message.pageId)pageId=message.pageId;render();});}
-  else addEventListener('storage',event=>{if(event.key!==STORAGE_KEY)return;try{const next=JSON.parse(event.newValue);if(next?.schemaVersion===1&&Array.isArray(next.pages)){draft=next;render();}}catch{}});
+  if(embedded){addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent)return;const message=event.data;if(message?.type!=='yewei-draft:update'||message.draft?.schemaVersion!==1||!Array.isArray(message.draft.pages))return;draft=migratePhotos(message.draft);if(message.pageId)pageId=message.pageId;render();});}
+  else addEventListener('storage',event=>{if(event.key!==STORAGE_KEY)return;try{const next=JSON.parse(event.newValue);if(next?.schemaVersion===1&&Array.isArray(next.pages)){draft=migratePhotos(next);render();}}catch{}});
   render();send({type:'yewei-draft:ready'});
 })();
