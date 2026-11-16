@@ -1,29 +1,40 @@
-/* The same system-font families used by NOEMA, with Chinese fallbacks. */
+/* One bold sans-serif voice throughout the site, with native Chinese fallbacks. */
 :root {
-  --sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  --serif: "Iowan Old Style", Baskerville, "Times New Roman", "Songti SC", "Noto Serif CJK SC", serif;
-  --mono: "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Manrope", "Arial", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --serif: var(--sans);
+  --mono: var(--sans);
 }
-body { font-family: var(--sans); }
+body { font-family: var(--sans); font-weight: 500; }
 button, input, select, textarea { font-family: inherit; }
-.hero h1 { font-family: var(--sans); font-weight: 800; letter-spacing: -.085em; }
-.hero h1 em { font-family: var(--serif); font-weight: 400; letter-spacing: -.075em; }
-.logo, .draft-logo, .serif, .handwriting { font-family: var(--serif); }
-.section h2, .page-intro h1 { font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; }
-.about-copy h3, .timeline-title strong, .project-info strong,
-.block-heading h2, .card-copy h3, #case-title, #detail-title {
-  font-family: var(--serif);
-  font-weight: 400;
-  letter-spacing: -.025em;
+h1, h2, h3, h4, h5, h6 { font-family: var(--sans); font-weight: 900; font-style: normal; }
+strong, b { font-weight: 800; }
+.hero h1, .hero h1 em, .home-intro-copy h1 {
+  font-family: var(--sans);
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -.065em;
 }
-.home-intro-copy h1 { font-family: var(--sans); font-weight: 800; letter-spacing: -.075em; line-height: .95; }
+.logo, .draft-logo, .serif, .handwriting {
+  font-family: var(--sans);
+  font-weight: 850;
+  font-style: normal;
+}
+.section h2, .page-intro h1, .about-copy h3, .timeline-title strong,
+.project-info strong, .block-heading h2, .card-copy h3, #case-title, #detail-title {
+  font-family: var(--sans);
+  font-weight: 850;
+  font-style: normal;
+  letter-spacing: -.035em;
+}
 .micro, .section-label, .page-eyebrow, .block-number,
 .case-eyebrow, .item-meta, .company-meta, .detail-meta,
 .timeline-period, .account-window-bar, .account-art-bottom {
-  font-family: var(--mono);
+  font-family: var(--sans);
+  font-weight: 700;
 }
+.portfolio-metrics strong, .case-metrics strong, .detail-metrics strong,
+.proof-link, .social-account-link > strong { font-family: var(--sans); font-weight: 800; }
 @media (max-width: 560px) {
-  .hero h1 { letter-spacing: -.08em; }
-  .section h2 { letter-spacing: -.04em; }
-  .home-intro-copy h1 { letter-spacing: -.07em; }
+  .hero h1, .home-intro-copy h1 { letter-spacing: -.06em; }
+  .section h2, .page-intro h1 { letter-spacing: -.035em; }
 }

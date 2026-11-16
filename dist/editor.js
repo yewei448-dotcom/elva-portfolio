@@ -100,7 +100,7 @@
       if (![1, 2].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
       normalized.structureVersion = value.structureVersion;
     }
-    for (const key of ['name', 'tagline', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
+    for (const key of ['name', 'tagline', 'phone', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
     let sectionCount = 0, itemCount = 0;
     const pageIds = new Set();
     for (const page of value.pages) {
@@ -329,8 +329,18 @@
       return previousValues.some(value => String(value || '').trim().toLowerCase() === address);
     } catch { return false; }
   }
+  function phoneDialValue(value) {
+    return String(value || '').replace(/[\s-]/g, '');
+  }
+  function matchesContactPhone(url, previousValues) {
+    if (typeof url !== 'string' || !/^tel:/i.test(url)) return false;
+    try {
+      const number = phoneDialValue(decodeURIComponent(url.slice(4)));
+      return previousValues.some(value => phoneDialValue(value) === number);
+    } catch { return false; }
+  }
   function syncContactValue(key, value, sourceInput) {
-    if (!['email', 'wechat'].includes(key)) return;
+    if (!['phone', 'email', 'wechat'].includes(key)) return;
     const oldSiteValue = draft.site[key] || '';
     const contacts = draft.pages.filter(page => page.id === 'contact').flatMap(page => page.sections || []).flatMap(section => section.items || []).filter(item => item.id === key);
     draft.site[key] = value;
@@ -348,16 +358,23 @@
         (item.links || []).forEach(link => {
           if (matchesContactEmail(link.url, previousValues)) link.url = updateMailto(link.url);
         });
+      } else if (key === 'phone') {
+        const number = phoneDialValue(value);
+        const url = number ? `tel:${number}` : '';
+        if (!item.url || matchesContactPhone(item.url, previousValues)) item.url = url;
+        (item.links || []).forEach(link => {
+          if (matchesContactPhone(link.url, previousValues)) link.url = url;
+        });
       } else if (previousValues.some(previous => item.details === `微信号：${previous}` || item.details === `微信号: ${previous}`)) {
         item.details = value ? `微信号：${value}` : '';
       }
     });
     document.querySelectorAll(`[data-contact-field="${key}"]`).forEach(input => { if (input !== sourceInput) input.value = value; });
-    if (key === 'email') {
+    if (key === 'email' || key === 'phone') {
       const item = contacts[0];
       if (item) {
-        document.querySelectorAll('[data-contact-url="email"]').forEach(input => { input.value = item.url || ''; });
-        document.querySelectorAll('[data-contact-proof="email"]').forEach(input => { input.value = item.links?.[Number(input.dataset.linkIndex)]?.url || ''; });
+        document.querySelectorAll(`[data-contact-url="${key}"]`).forEach(input => { input.value = item.url || ''; });
+        document.querySelectorAll(`[data-contact-proof="${key}"]`).forEach(input => { input.value = item.links?.[Number(input.dataset.linkIndex)]?.url || ''; });
       }
     }
   }
@@ -391,13 +408,13 @@
     overlay.append(overlayLabel, range, node('small', 'field-hint', '有背景照片时使用，让标题更清楚。'));
     background.body.append(overlay);
     const siteGroup = group('网站基本信息', '姓名、简介与联系方式', false);
-    [['name', '姓名'], ['tagline', '个人简介'], ['email', '联系邮箱'], ['wechat', '微信号']].forEach(([key, label]) => {
+    [['name', '姓名'], ['tagline', '个人简介'], ['phone', '电话号码'], ['email', '联系邮箱'], ['wechat', '微信号']].forEach(([key, label]) => {
       const basicField = field(label, draft.site[key], (value, input) => {
-        if (key === 'email' || key === 'wechat') syncContactValue(key, value, input);
+        if (['phone', 'email', 'wechat'].includes(key)) syncContactValue(key, value, input);
         else draft.site[key] = value;
         changed();
-      }, { multiline: key === 'tagline', rows: 2 });
-      if (key === 'email' || key === 'wechat') basicField.querySelector('input').dataset.contactField = key;
+      }, { multiline: key === 'tagline', rows: 2, type: key === 'phone' ? 'tel' : 'text' });
+      if (['phone', 'email', 'wechat'].includes(key)) basicField.querySelector('input').dataset.contactField = key;
       siteGroup.body.append(basicField);
     });
     els.settings.append(pageGroup.details, background.details);
@@ -518,8 +535,8 @@
         const row = node('div', 'proof-link-row');
         row.append(node('span', 'proof-link-index', `链接 ${String(index + 1).padStart(2, '0')}`));
         const targetField = field('目标地址', link.url, value => { link.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '可以先留空，之后再补链接。' });
-        if (currentPage().id === 'contact' && item.id === 'email') {
-          const input = targetField.querySelector('input'); input.dataset.contactProof = 'email'; input.dataset.linkIndex = String(index);
+        if (currentPage().id === 'contact' && ['phone', 'email'].includes(item.id)) {
+          const input = targetField.querySelector('input'); input.dataset.contactProof = item.id; input.dataset.linkIndex = String(index);
         }
         row.append(field('链接文字', link.label, value => { link.label = value; changed(); }, { placeholder: '如：查看视频 / 作品说明' }), targetField);
         row.append(button('×', 'icon-button delete-button proof-link-remove', () => { item.links.splice(index, 1); changed(); redraw(); }, `删除关联链接 ${index + 1}`));
@@ -580,14 +597,14 @@
           field('时间', item.period, value => { item.period = value; changed(); }, { placeholder: '如：2026.07 — 至今' }));
         body.append(companyFields);
       }
-      const contactKey = editingPageId === 'contact' && ['email', 'wechat'].includes(item.id) ? item.id : '';
-      const descriptionField = field(contactKey === 'email' ? '邮箱地址' : contactKey === 'wechat' ? '微信号' : section.kind === 'photo' ? '照片说明' : '简短介绍', item.text, (value, input) => {
+      const contactKey = editingPageId === 'contact' && ['phone', 'email', 'wechat'].includes(item.id) ? item.id : '';
+      const descriptionField = field(contactKey === 'phone' ? '电话号码' : contactKey === 'email' ? '邮箱地址' : contactKey === 'wechat' ? '微信号' : section.kind === 'photo' ? '照片说明' : '简短介绍', item.text, (value, input) => {
         if (contactKey) syncContactValue(contactKey, value, input); else item.text = value;
         changed();
-      }, { multiline: !contactKey, rows: 3 });
+      }, { multiline: !contactKey, rows: 3, type: contactKey === 'phone' ? 'tel' : 'text' });
       if (contactKey) descriptionField.querySelector('input').dataset.contactField = contactKey;
       const urlField = field(section.kind === 'videos' ? '视频链接' : '跳转链接', item.url, value => { item.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '留空时不显示外部跳转。' });
-      if (contactKey === 'email') urlField.querySelector('input').dataset.contactUrl = 'email';
+      if (contactKey === 'email' || contactKey === 'phone') urlField.querySelector('input').dataset.contactUrl = contactKey;
       body.append(
         field(section.kind === 'companies' ? '补充标签 / 备注' : '标签 / 时间 / 备注', item.meta, value => { item.meta = value; changed(); }, { placeholder: '可选' }),
         descriptionField, urlField

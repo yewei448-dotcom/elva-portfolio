@@ -90,17 +90,26 @@
   function render(){
     if(!draft.pages.some(p=>p.id===pageId))pageId=draft.pages[0]?.id||'home';
     const page=draft.pages.find(p=>p.id===pageId);if(!page)return;
+    document.body.dataset.page=page.id;
     const previousPage=app.dataset.page;const previousScroll=scrollY;
     if(previousPage&&previousPage!==page.id&&dialog.open)dialog.close();
     app.dataset.page=page.id;app.replaceChildren();
     const bg=page.background||{};document.body.style.backgroundColor=/^#[0-9a-f]{3,8}$/i.test(bg.color||'')?bg.color:'#faf8ef';
     const bgImage=safeUrl(bg.image,true);const overlay=Math.max(0,Math.min(.8,Number(bg.overlay)||0));document.body.classList.toggle('has-background-image',Boolean(bgImage));
-    document.body.style.backgroundImage=bgImage?`linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${overlay})),url(${JSON.stringify(bgImage)})`:'';
+    const lowerOverlay=page.id==='contact'?Math.min(.8,overlay+.1):overlay;
+    document.body.style.backgroundImage=bgImage?`linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${lowerOverlay})),url(${JSON.stringify(bgImage)})`:'';
     document.title=`${draft.site?.name||'我的网站'} · ${page.name||'预览'}`;
     const header=el('header','draft-header');const logo=el('a','draft-logo','yw✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
     const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');draft.pages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
     header.append(logo,nav);app.append(header);
-    const main=el('main','draft-main');const hero=el('div','page-intro');
+    const main=el('main','draft-main');
+    if(page.id==='contact'&&typeof window.PortfolioUI?.contactScene==='function'){
+      main.classList.add('contact-preview-main');
+      main.append(window.PortfolioUI.contactScene(page,draft.site,{onHome:()=>goToPage('home'),onEdit:embedded?()=>send({type:'yewei-draft:select',sectionId:page.sections[0]?.id,pageId:page.id}):null}));app.append(main);
+      if(!embedded){const edit=el('a','standalone-edit','返回可视化编辑器 ↗');edit.href='editor.html?page=contact';app.append(edit);}
+      return;
+    }
+    const hero=el('div','page-intro');
     const portraitImage=page.id==='home'?safeUrl(page.portraitImage,true):'';
     const intro=portraitImage?el('div','home-intro-copy'):hero;
     intro.append(el('span','page-eyebrow',`${String(draft.pages.indexOf(page)+1).padStart(2,'0')} / ${page.name||page.id}`),el('h1','',page.title||page.name),el('p','page-subtitle',page.subtitle||''));

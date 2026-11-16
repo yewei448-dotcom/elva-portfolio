@@ -179,22 +179,46 @@
   }
   function contacts(section, site = {}) {
     const group = el('div', 'portfolio-contact-links');
-    (section.items || []).forEach(item => {
-      const isEmail = item.id === 'email'; const isWechat = item.id === 'wechat';
-      const value = isEmail ? site.email || item.text : isWechat ? site.wechat || item.text : item.text;
-      const url = isEmail && value ? safeUrl(`mailto:${value}`) : safeUrl(item.url);
-      const node = isWechat ? el('button', 'portfolio-contact-link') : url ? link(url, '', 'portfolio-contact-link') : el('div', 'portfolio-contact-link');
-      if (isWechat) {
-        node.type = 'button'; node.setAttribute('aria-label', `复制微信号 ${value || ''}`);
+    const feedback = el('span', 'contact-feedback'); feedback.hidden = true;
+    feedback.setAttribute('role', 'status'); feedback.setAttribute('aria-live', 'polite');
+    let feedbackTimer;
+    ['phone', 'email', 'wechat'].forEach(key => {
+      const item = (section.items || []).find(x => x.id === key);
+      const value = Object.hasOwn(site, key) ? String(site[key] ?? '').trim() : String(item?.text || '').trim();
+      if (!value) return;
+      const label = key === 'phone' ? `拨打电话 ${value}` : key === 'email' ? `发送邮件 ${value}` : `复制微信号 ${value}`;
+      const url = key === 'phone' ? safeUrl(`tel:${value.replace(/[\s-]/g, '')}`) : key === 'email' ? safeUrl(`mailto:${value}`) : '';
+      if (key !== 'wechat' && !url) return;
+      const node = key === 'wechat' ? el('button', `portfolio-contact-icon contact-${key}`) : link(url, '', `portfolio-contact-icon contact-${key}`);
+      node.setAttribute('aria-label', label); node.title = label;
+      const icon = el('img'); icon.src = `assets/ui/${key === 'phone' ? 'phone' : key === 'email' ? 'email' : 'wechat'}.svg`;
+      icon.alt = ''; icon.width = 25; icon.height = 25; node.append(icon);
+      if (key === 'wechat') {
+        node.type = 'button';
         node.addEventListener('click', async () => {
-          const state = node.querySelector('.contact-action');
-          try { await navigator.clipboard.writeText(value || ''); state.textContent = '已复制'; }
-          catch { state.textContent = value || ''; }
+          clearTimeout(feedbackTimer);
+          try { await navigator.clipboard.writeText(value); feedback.textContent = '微信号已复制'; }
+          catch { feedback.textContent = `微信：${value}`; }
+          feedback.hidden = false; feedbackTimer = setTimeout(() => { feedback.hidden = true; }, 3500);
         });
       }
-      node.append(el('span', 'contact-method', item.title), el('strong', '', value || item.title), el('span', 'contact-action', isWechat ? '复制 ↗' : '↗'));
       group.append(node);
-    }); return group;
+    }); group.append(feedback); return group;
   }
-  window.PortfolioUI = { companyCard, capability, workflow, contacts, safeUrl };
+  function contactScene(page, site = {}, options = {}) {
+    const scene = el('div', 'contact-scene');
+    const bar = el('div', 'contact-topbar');
+    const links = page.sections?.find(s => s.kind === 'links') || { items: [] };
+    const back = link(options.onHome ? '#home' : '#top', '回到顶部 ↗', 'contact-back');
+    if (options.onHome) back.addEventListener('click', event => { event.preventDefault(); options.onHome(); });
+    bar.append(contacts(links, site), back);
+    const message = el('div', 'contact-message');
+    message.append(el('h2', '', page.title || '一起做点\n值得被记住的事。'));
+    const footer = el('footer', 'contact-signature');
+    const edit = link('editor.html?page=contact', '编辑 ↗', 'contact-edit');
+    if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
+    footer.append(el('span', '', `${site.name || '叶薇'} / 个人网站`), edit, el('span', '', `© ${new Date().getFullYear()}`));
+    scene.append(bar, message, footer); return scene;
+  }
+  window.PortfolioUI = { companyCard, capability, workflow, contacts, contactScene, safeUrl };
 })();

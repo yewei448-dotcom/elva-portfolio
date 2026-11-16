@@ -17,6 +17,16 @@
     if (!page) return;
     const section = el('section', `portfolio-section section paper portfolio-${id}`); section.id = id;
     const shell = el('div', 'section-shell');
+    if (id === 'contact') {
+      section.classList.remove('paper'); section.classList.add('photo-finale');
+      const bg = page.background || {};
+      const image = ui.safeUrl(bg.image, true);
+      const overlay = Math.max(0, Math.min(.8, Number(bg.overlay) || 0));
+      section.classList.toggle('has-photo', Boolean(image));
+      section.style.backgroundColor = /^#[0-9a-f]{3,8}$/i.test(bg.color || '') ? bg.color : '#7094ac';
+      section.style.backgroundImage = image ? `linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${Math.min(.8, overlay + .1)})),url(${JSON.stringify(image)})` : 'none';
+      shell.append(ui.contactScene(page, draft.site)); section.append(shell); main.append(section); return;
+    }
     const heading = el('header', 'portfolio-heading');
     const title = el('div');
     title.append(el('span', 'portfolio-kicker', `${String(i + 1).padStart(2, '0')} / ${labels[i]}`), el('h2', '', page.title));
@@ -35,12 +45,6 @@
       const grid = el('div', 'workbench-grid');
       page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.workflow(item, index)));
       shell.append(grid);
-    } else {
-      page.sections.forEach(s => shell.append(ui.contacts(s, draft.site)));
-      const footer = el('footer', 'portfolio-footer');
-      const edit = el('a', '', '编辑网站 ↗'); edit.href = 'editor.html?page=capability';
-      const back = el('a', '', '回到顶部 ↑'); back.href = '#top';
-      footer.append(el('span', '', `© ${new Date().getFullYear()} YE WEI / 叶薇`), edit, back); shell.append(footer);
     }
     section.append(shell); main.append(section);
   });

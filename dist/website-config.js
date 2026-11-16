@@ -5,6 +5,7 @@ window.websiteDefaults = {
   "site": {
     "name": "叶薇",
     "tagline": "达人营销 / 社媒运营 / SEO / AI 工作流",
+    "phone": "17360671346",
     "email": "2013519586@qq.com",
     "wechat": "Qzsa_w"
   },
@@ -503,12 +504,12 @@ window.websiteDefaults = {
     {
       "id": "contact",
       "name": "联系方式",
-      "title": "联系方式",
+      "title": "一起做点\n值得被记住的事。",
       "subtitle": "",
       "background": {
         "color": "#fbfaf5",
-        "image": "",
-        "overlay": 0.12
+        "image": "assets/yewei-seaside-background.png",
+        "overlay": 0.25
       },
       "sections": [
         {
@@ -517,6 +518,23 @@ window.websiteDefaults = {
           "title": "保持联系",
           "subtitle": "",
           "items": [
+            {
+              "id": "phone",
+              "title": "电话",
+              "text": "17360671346",
+              "url": "tel:17360671346",
+              "image": "",
+              "meta": "电话号码",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "拨打电话",
+                  "url": "tel:17360671346"
+                }
+              ]
+            },
             {
               "id": "email",
               "title": "邮件",
@@ -584,11 +602,15 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
     ],
     experience:[{color:'#faf8ef',image:'',overlay:0.12}],
     capability:[{color:'#e8e4ef',image:'',overlay:0.12}],
+    contact:[
+      {color:'#fbfaf5',image:'',overlay:0.12},
+      {color:'#faf8ef',image:'',overlay:0.12}
+    ],
     building:[{color:'#e8e4ef',image:'',overlay:0.12}],
     life:[{color:'#f5eedf',image:'',overlay:0.12}]
   };
   let photoChanged = false;
-  const pages = value.pages.map(page => {
+  let pages = value.pages.map(page => {
     if (!isObject(page)) return page;
     const standard = defaults.pages.find(p=>p.id===page.id);
     let next = page;
@@ -598,13 +620,42 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
       next = {...next,background:{...page.background,...(standard?.background || {color:'#fbfaf5'})}};
     }
     if (page.id==='home' && standard && !own(page,'portraitImage')) next={...next,portraitImage:standard.portraitImage};
+    if (page.id==='contact' && standard && ['联系方式','联系我'].includes(page.title)) next={...next,title:standard.title};
     if (next!==page) photoChanged=true;
     return next;
   });
   const taglineChanged = isObject(value.site) && value.site.tagline==='做内容，做出海营销，也会自己搭点工具。';
-  const photoDraft = photoChanged || taglineChanged
+  let photoDraft = photoChanged || taglineChanged
     ? {...value,pages,...(taglineChanged ? {site:{...value.site,tagline:defaults.site.tagline}} : {})}
     : value;
+  const defaultContact=defaults.pages.find(page=>page.id==='contact');
+  const oldContactPage=pages.find(page=>isObject(page)&&page.id==='contact');
+  const contactSections=Array.isArray(oldContactPage?.sections) ? oldContactPage.sections : [];
+  const existingPhone=contactSections.flatMap(section=>isObject(section)&&Array.isArray(section.items)?section.items:[]).find(item=>isObject(item)&&item.id==='phone');
+  if (isObject(photoDraft.site) && !own(photoDraft.site,'phone')) {
+    let phone=defaults.site.phone;
+    if (typeof existingPhone?.text==='string') phone=existingPhone.text;
+    else if (typeof existingPhone?.url==='string' && /^tel:/i.test(existingPhone.url)) {
+      try {phone=decodeURIComponent(existingPhone.url.slice(4)).replace(/[\s-]/g,'');} catch {}
+    }
+    photoDraft={...photoDraft,site:{...photoDraft.site,phone}};
+  }
+  if (oldContactPage && Array.isArray(oldContactPage.sections) && !existingPhone) {
+    const defaultSection=defaultContact.sections.find(section=>section.id==='contact-links');
+    const phone=clone(defaultSection.items.find(item=>item.id==='phone'));
+    const number=isObject(photoDraft.site)&&own(photoDraft.site,'phone') ? photoDraft.site.phone : defaults.site.phone;
+    phone.text=typeof number==='string' ? number : '';
+    const dial=phone.text.replace(/[\s-]/g,'');
+    phone.url=dial ? 'tel:'+dial : '';
+    phone.links=[{label:'拨打电话',url:phone.url}];
+    let sectionIndex=oldContactPage.sections.findIndex(section=>isObject(section)&&section.id==='contact-links'&&Array.isArray(section.items));
+    if (sectionIndex<0) sectionIndex=oldContactPage.sections.findIndex(section=>isObject(section)&&section.kind==='links'&&Array.isArray(section.items));
+    const sections=oldContactPage.sections.slice();
+    if (sectionIndex>=0) sections[sectionIndex]={...sections[sectionIndex],items:[phone,...sections[sectionIndex].items]};
+    else sections.push({...clone(defaultSection),items:[phone]});
+    pages=pages.map(page=>page===oldContactPage ? {...page,sections} : page);
+    photoDraft={...photoDraft,pages};
+  }
   const needsStructure = !own(value,'structureVersion') || value.structureVersion === 1;
   if (!needsStructure) return photoDraft;
   const next = clone(defaults);
@@ -709,6 +760,12 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
   migrateItems(oldSection(oldAi||building,'ai-workflows','workflow'),ai.sections[0]);
   const contact=nextPage('contact'),oldContact=oldPage('contact');
   copyPageBackground(oldContact,contact);
+  if (typeof oldContact?.title==='string') contact.title=oldContact.title;
+  const phone=contact.sections[0].items.find(i=>i.id==='phone');
+  phone.text=typeof next.site.phone==='string' ? next.site.phone : phone.text;
+  const dial=phone.text.replace(/[\s-]/g,'');
+  phone.url=dial ? 'tel:'+dial : '';
+  phone.links=[{label:'拨打电话',url:phone.url}];
   const email=contact.sections[0].items.find(i=>i.id==='email');
   email.text=typeof next.site.email==='string' ? next.site.email : email.text;
   email.url='mailto:'+encodeURIComponent(email.text);

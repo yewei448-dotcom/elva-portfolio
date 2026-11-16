@@ -9,6 +9,7 @@
 - `dist/draft.html`：实时草稿预览；鼠标悬停显示能力分支，点击展开案例，再展开代表作品。
 - `dist/assets/logos/SOURCES.txt`：四家公司的官方 Logo 来源；GURU 保留公司文字。
 - `dist/journal-type.css` / `journal-cursor.*`：系统字体搭配与桌面像素拖尾；触摸和减少动态效果时停用拖尾。
+- `dist/finale.css` / `dist/assets/ui/`：全屏海景封面与联系区、粗黑无衬线字体、iPhone 风格快捷导航与联系图标。工作经历与 AI 应用采用可展开的白色玻璃叠放卡片。
 
 编辑暂存在当前浏览器 `yewei.visualDraft.v1`，通过“导出给我”下载 JSON 交回完善，不会直接覆盖线上展示版。升级前旧稿原文备份到 `yewei.visualDraft.beforeCapabilities.v1`；自定义背景、照片及兼容内容会保留。空证明链接可以继续补充，不构造作品地址。
 
