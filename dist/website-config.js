@@ -15,7 +15,7 @@ window.websiteDefaults = {
       "title": "HELLO,\nI’M YE WEI.",
       "subtitle": "做内容，做出海营销，也会自己搭点工具。",
       "background": {
-        "color": "#faf8ef",
+        "color": "#fbfaf5",
         "image": "assets/yewei-seaside-background.png",
         "overlay": 0.22
       },
@@ -56,7 +56,7 @@ window.websiteDefaults = {
       "title": "这些地方，\n我待过。",
       "subtitle": "点击公司，看看我具体做了什么。",
       "background": {
-        "color": "#faf8ef",
+        "color": "#fbfaf5",
         "image": "",
         "overlay": 0.12
       },
@@ -225,7 +225,7 @@ window.websiteDefaults = {
       "title": "正在做，\n也正在尝试。",
       "subtitle": "我的内容、作品、代码和自动化流程。",
       "background": {
-        "color": "#e8e4ef",
+        "color": "#fbfaf5",
         "image": "",
         "overlay": 0.12
       },
@@ -365,7 +365,7 @@ window.websiteDefaults = {
       "title": "生活里的我，\n慢慢认识。",
       "subtitle": "照片、个性、爱好，还有工作之外的那些小事。",
       "background": {
-        "color": "#f5eedf",
+        "color": "#fbfaf5",
         "image": "",
         "overlay": 0.12
       },
@@ -471,21 +471,35 @@ window.websiteDefaults = {
   ]
 };
 
-// 兼容旧版编辑稿：只替换从未更改过的首页默认背景。
-// 主动移除的悬挂照片（空字符串）会保留，自定义背景不会被覆盖。
+// 兼容旧版编辑稿：仅迁移完整匹配旧默认值的背景，不覆盖自定义配色或照片。
+// 主动移除的悬挂照片（空字符串）保留；缺少该字段时补入新默认照片。
 window.migrateWebsiteDraftPhotos = function (value) {
   if (!value || value.schemaVersion !== 1 || !Array.isArray(value.pages)) return value;
-  const home = value.pages.find(page => page && page.id === 'home');
-  const defaults = window.websiteDefaults.pages.find(page => page.id === 'home');
-  if (!home || !defaults) return value;
-  let nextHome = home;
-  const oldBackground = home.background;
-  if (oldBackground && oldBackground.image === 'assets/meadow.jpg' && oldBackground.color === '#faf8ef' && oldBackground.overlay === 0.22) {
-    nextHome = { ...nextHome, background: { ...oldBackground, image: defaults.background.image } };
-  }
-  if (!Object.prototype.hasOwnProperty.call(home, 'portraitImage')) {
-    nextHome = { ...nextHome, portraitImage: defaults.portraitImage };
-  }
-  if (nextHome === home) return value;
-  return { ...value, pages: value.pages.map(page => page === home ? nextHome : page) };
+  const previousBackgrounds = {
+    home: [
+      { color: '#faf8ef', image: 'assets/meadow.jpg', overlay: 0.22 },
+      { color: '#faf8ef', image: 'assets/yewei-seaside-background.png', overlay: 0.22 }
+    ],
+    experience: [{ color: '#faf8ef', image: '', overlay: 0.12 }],
+    building: [{ color: '#e8e4ef', image: '', overlay: 0.12 }],
+    life: [{ color: '#f5eedf', image: '', overlay: 0.12 }]
+  };
+  let changed = false;
+  const pages = value.pages.map(page => {
+    if (!page || typeof page !== 'object') return page;
+    const defaults = window.websiteDefaults.pages.find(item => item.id === page.id);
+    if (!defaults) return page;
+    let nextPage = page;
+    const bg = page.background;
+    const previous = Object.prototype.hasOwnProperty.call(previousBackgrounds, page.id) ? previousBackgrounds[page.id] : [];
+    if (bg && previous.some(old => bg.color === old.color && bg.image === old.image && bg.overlay === old.overlay)) {
+      nextPage = { ...nextPage, background: { ...bg, ...defaults.background } };
+    }
+    if (page.id === 'home' && !Object.prototype.hasOwnProperty.call(page, 'portraitImage')) {
+      nextPage = { ...nextPage, portraitImage: defaults.portraitImage };
+    }
+    if (nextPage !== page) changed = true;
+    return nextPage;
+  });
+  return changed ? { ...value, pages } : value;
 };

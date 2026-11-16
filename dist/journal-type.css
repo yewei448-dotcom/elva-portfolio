@@ -1,0 +1,29 @@
+/* The same system-font families used by NOEMA, with Chinese fallbacks. */
+:root {
+  --sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --serif: "Iowan Old Style", Baskerville, "Times New Roman", "Songti SC", "Noto Serif CJK SC", serif;
+  --mono: "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+}
+body { font-family: var(--sans); }
+button, input, select, textarea { font-family: inherit; }
+.hero h1 { font-family: var(--sans); font-weight: 800; letter-spacing: -.085em; }
+.hero h1 em { font-family: var(--serif); font-weight: 400; letter-spacing: -.075em; }
+.logo, .draft-logo, .serif, .handwriting { font-family: var(--serif); }
+.section h2, .page-intro h1 { font-family: var(--serif); font-weight: 400; letter-spacing: -.045em; }
+.about-copy h3, .timeline-title strong, .project-info strong,
+.block-heading h2, .card-copy h3, #case-title, #detail-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+.home-intro-copy h1 { font-family: var(--sans); font-weight: 800; letter-spacing: -.075em; line-height: .95; }
+.micro, .section-label, .page-eyebrow, .block-number,
+.case-eyebrow, .item-meta, .company-meta, .detail-meta,
+.timeline-period, .account-window-bar, .account-art-bottom {
+  font-family: var(--mono);
+}
+@media (max-width: 560px) {
+  .hero h1 { letter-spacing: -.08em; }
+  .section h2 { letter-spacing: -.04em; }
+  .home-intro-copy h1 { letter-spacing: -.07em; }
+}

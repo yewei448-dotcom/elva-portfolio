@@ -1,0 +1,88 @@
+/* A small pixel trail accompanies the system pointer; it never replaces it. */
+.yw-pixel-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  contain: strict;
+}
+
+.yw-pixel-cursor[hidden] {
+  display: none !important;
+}
+
+.yw-pixel-cursor > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: #101815;
+  opacity: .72;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.yw-pixel-cursor > span:nth-child(1) {
+  width: 4px;
+  height: 4px;
+  background: #ead9a8;
+  opacity: .95;
+}
+
+.yw-pixel-cursor > span:nth-child(2),
+.yw-pixel-cursor > span:nth-child(5),
+.yw-pixel-cursor > span:nth-child(9),
+.yw-pixel-cursor > span:nth-child(14) {
+  width: 5px;
+  height: 5px;
+}
+
+.yw-pixel-cursor > span:nth-child(3),
+.yw-pixel-cursor > span:nth-child(8),
+.yw-pixel-cursor > span:nth-child(12) {
+  width: 11px;
+  height: 11px;
+  background: #29322f;
+}
+
+.yw-pixel-cursor > span:nth-child(4),
+.yw-pixel-cursor > span:nth-child(10),
+.yw-pixel-cursor > span:nth-child(16) {
+  width: 7px;
+  height: 7px;
+  background: #77756c;
+}
+
+.yw-pixel-cursor > span:nth-child(6),
+.yw-pixel-cursor > span:nth-child(13) {
+  width: 14px;
+  height: 14px;
+}
+
+.yw-pixel-cursor > span:nth-child(7),
+.yw-pixel-cursor > span:nth-child(11),
+.yw-pixel-cursor > span:nth-child(15) {
+  width: 3px;
+  height: 3px;
+}
+
+.yw-pixel-cursor > span:nth-child(10) { opacity: .48; }
+.yw-pixel-cursor > span:nth-child(14) { opacity: .32; }
+.yw-pixel-cursor > span:nth-child(17) {
+  width: 10px;
+  height: 10px;
+  opacity: .16;
+}
+.yw-pixel-cursor > span:nth-child(18) {
+  width: 4px;
+  height: 4px;
+  opacity: .16;
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .yw-pixel-cursor { display: none !important; }
+}
