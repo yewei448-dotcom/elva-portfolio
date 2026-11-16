@@ -22,3 +22,12 @@
 在此目录执行 `python3 -m http.server 4178 --directory dist`，浏览 `http://127.0.0.1:4178`。无构建步骤和第三方前端依赖。
 
 原简历中的 Insta360 结束月份不完整，页面只显示开始月份；CMS 案例使用可核对的前后耗时“120 分钟 → 25 分钟”。
+
+## 可视化编辑稿
+
+- `/editor.html` 是可视化编辑器；支持 Experience、Building、生活等页面的背景、板块和内容调整。
+- `/draft.html` 是编辑稿预览；不会直接替换 `/index.html` 已上线展示版。
+- `dist/website-config.js` 定义初始草稿；公司职责来自简历，生活个性、GitHub 和未提供的视频链接均预留，未作虚构。
+- 编辑保存在当前浏览器的 localStorage（`yewei.visualDraft.v1`）。不同账号、设备或浏览器之间不会自动同步。
+- “导出给我”下载 `yewei-website-draft.json`，可以导入恢复，也可以交给后续代理审阅、细化并集成到线上版。
+- 背景与图片上传仅进入当前草稿，不上传到服务端；导出的 JSON 会包含所选图片数据。
