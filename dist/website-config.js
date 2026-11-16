@@ -1,10 +1,10 @@
-// 网站内容与旧编辑稿迁移。项目期数据与待填证明链接分别保留。
+// 网站默认内容；学历信息核对个人简历第 1 页，未提供成绩或奖项。
 window.websiteDefaults = {
   "schemaVersion": 1,
-  "structureVersion": 2,
+  "structureVersion": 3,
   "site": {
     "name": "叶薇",
-    "tagline": "达人营销 / 社媒运营 / SEO / AI 工作流",
+    "tagline": "达人 · SEO · AI",
     "phone": "17360671346",
     "email": "2013519586@qq.com",
     "wechat": "Qzsa_w"
@@ -13,15 +13,61 @@ window.websiteDefaults = {
     {
       "id": "home",
       "name": "首页",
-      "portraitImage": "assets/yewei-hanging-portrait.png",
-      "title": "HELLO,\nI’M YE WEI.",
-      "subtitle": "达人营销 / 社媒运营 / SEO / AI 工作流",
+      "portraitImage": "assets/elva-hanging-photo.jpg",
+      "title": "Elva,\nTo Be or Not To Be",
+      "subtitle": "达人 · SEO · AI",
       "background": {
         "color": "#fbfaf5",
         "image": "assets/yewei-seaside-background.png",
         "overlay": 0.22
       },
-      "sections": []
+      "sections": [],
+      "avatarImage": "assets/elva-ai-avatar.png"
+    },
+    {
+      "id": "education",
+      "name": "学历",
+      "title": "教育经历",
+      "subtitle": "",
+      "background": {
+        "color": "#fbfaf5",
+        "image": "",
+        "overlay": 0.12
+      },
+      "sections": [
+        {
+          "id": "education-schools",
+          "kind": "text",
+          "title": "",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "swufe",
+              "title": "西南财经大学",
+              "text": "211 高校",
+              "url": "",
+              "image": "",
+              "meta": "硕士 / 英语口译 / 2024.09–2026.06",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            },
+            {
+              "id": "tjfsu",
+              "title": "天津外国语大学滨海外事学院",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "本科 / 翻译 / 2019.09–2023.06",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "experience",
@@ -186,9 +232,9 @@ window.websiteDefaults = {
     },
     {
       "id": "capability",
-      "name": "Capability",
-      "title": "运营能力",
-      "subtitle": "爆款内容 / 品牌账号 / 搜索增长",
+      "name": "Portfolio",
+      "title": "作品集",
+      "subtitle": "案例、内容与合作。",
       "background": {
         "color": "#fbfaf5",
         "image": "",
@@ -502,6 +548,95 @@ window.websiteDefaults = {
       ]
     },
     {
+      "id": "life",
+      "name": "生活",
+      "title": "生活里的片段",
+      "subtitle": "",
+      "background": {
+        "color": "#fbfaf5",
+        "image": "",
+        "overlay": 0.12
+      },
+      "sections": [
+        {
+          "id": "life-photos",
+          "kind": "photo",
+          "title": "相册",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "photo-1",
+              "title": "",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            },
+            {
+              "id": "photo-2",
+              "title": "",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            },
+            {
+              "id": "photo-3",
+              "title": "",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            }
+          ]
+        },
+        {
+          "id": "life-notes",
+          "kind": "text",
+          "title": "日常记录",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "life-note-1",
+              "title": "",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            },
+            {
+              "id": "life-note-2",
+              "title": "",
+              "text": "",
+              "url": "",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "contact",
       "name": "联系方式",
       "title": "一起做点\n值得被记住的事。",
@@ -588,8 +723,8 @@ window.websiteDefaults = {
   ]
 };
 
-// 纯数据迁移：不读写 localStorage；旧稿备份由编辑器负责。
-window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
+// 保留旧版照片、联系方式与早期 Building 内容的兼容转换。
+function migrateLegacyWebsiteDraft(value) {
   if (!value || value.schemaVersion !== 1 || !Array.isArray(value.pages)) return value;
   const own = (object,key) => Object.prototype.hasOwnProperty.call(object,key);
   const clone = object => JSON.parse(JSON.stringify(object));
@@ -779,5 +914,120 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
     if (!old.url && !(Array.isArray(old.links)&&old.links.some(l=>l.url))) continue;
     if (!contact.sections[0].items.some(i=>i.id===old.id)) contact.sections[0].items.push(mergeItem(null,old));
   }
+  return next;
+};
+
+
+// v3 增加学历、生活与头像，保留用户自定义条目和链接。
+window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value) {
+  if (!value || value.schemaVersion!==1 || !Array.isArray(value.pages)) return value;
+  // v3 已由用户编辑的内容不再套用历史默认值；更高版本交由归一化器提示。
+  if (Number(value.structureVersion)>=3) return value;
+  const clone=object=>JSON.parse(JSON.stringify(object));
+  const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
+  const own=(value,key)=>Object.prototype.hasOwnProperty.call(value,key);
+  const defaults=window.websiteDefaults;
+  const prepared=migrateLegacyWebsiteDraft(value);
+  const next=clone(prepared);next.structureVersion=3;
+  const rawPage=id=>value.pages.find(page=>object(page)&&page.id===id);
+  const defaultPage=id=>defaults.pages.find(page=>page.id===id);
+  const ensurePage=id=>{
+    let page=next.pages.find(page=>page.id===id);
+    if(!page){page=clone(defaultPage(id));next.pages.push(page);}
+    return page;
+  };
+  const uniqueId=(proposed,used)=>{
+    let candidate=proposed,index=2;
+    while(used.has(candidate))candidate=proposed+'-'+index++;
+    return candidate;
+  };
+  function appendSection(page,section) {
+    if(!object(section)||!Array.isArray(section.items))return;
+    page.sections=Array.isArray(page.sections)?page.sections:[];
+    const saved=page.sections.find(item=>item.id===section.id);
+    if(saved&&JSON.stringify(saved)===JSON.stringify(section))return;
+    const copied=clone(section);
+    if(saved)copied.id=uniqueId(section.id+'-legacy',new Set(page.sections.map(item=>item.id)));
+    page.sections.push(copied);
+  }
+  const fromLegacy=value.structureVersion!==2;
+  const educationSource=rawPage('education'),lifeSource=rawPage('life');
+  if(fromLegacy){
+    ['home','experience','capability','ai','contact'].forEach(id=>{
+      const source=rawPage(id);if(!source)return;
+      const target=ensurePage(id);
+      ['name','title','subtitle'].forEach(key=>{
+        if(typeof source[key]!=='string')return;
+        if(id==='contact'&&key==='title'&&['联系方式','联系我'].includes(source[key]))return;
+        target[key]=source[key];
+      });
+    });
+    if(educationSource){const index=next.pages.findIndex(page=>page.id==='education');const copied=clone(educationSource);if(index>=0)next.pages[index]=copied;else next.pages.push(copied);}
+    if(lifeSource){
+      const index=next.pages.findIndex(page=>page.id==='life');const copied=clone(lifeSource);
+      const bg=copied.background;
+      if(bg&&bg.color==='#f5eedf'&&bg.image===''&&bg.overlay===.12)copied.background={...bg,...defaultPage('life').background};
+      if(index>=0)next.pages[index]=copied;else next.pages.push(copied);
+    }
+    const oldHome=rawPage('home');
+    if(oldHome&&Array.isArray(oldHome.sections))ensurePage('home').sections=clone(oldHome.sections);
+    const oldExperience=rawPage('experience'),experience=ensurePage('experience');
+    const oldSections=Array.isArray(oldExperience?.sections)?oldExperience.sections:[];
+    const isEducation=section=>section.id==='education'||section.id==='education-schools'||/教育|学历/.test(section.title||'');
+    const educationSections=oldSections.filter(section=>object(section)&&isEducation(section));
+    if(educationSections.length){
+      const page=ensurePage('education');if(!educationSource)page.sections=[];
+      educationSections.forEach(section=>appendSection(page,section));
+    }
+    const firstCompany=oldSections.find(section=>object(section)&&(section.id==='experience-companies'||section.kind==='companies'));
+    if(firstCompany&&experience.sections[0]){
+      const current=experience.sections[0];experience.sections[0]={...clone(firstCompany),items:current.items};
+    }
+    oldSections.filter(section=>object(section)&&section!==firstCompany&&!isEducation(section)).forEach(section=>appendSection(experience,section));
+    const portfolio=ensurePage('capability'),oldPortfolio=rawPage('capability');
+    if(Array.isArray(oldPortfolio?.sections))oldPortfolio.sections.forEach(section=>{
+      if(!['influencer','social','seo'].includes(section.id))appendSection(portfolio,section);
+      else{const current=portfolio.sections.find(item=>item.id===section.id);if(current){current.title=section.title;current.subtitle=section.subtitle||'';}}
+    });
+    const building=rawPage('building'),aiSource=rawPage('ai'),ai=ensurePage('ai');
+    const sourceWorkflows=Array.isArray((aiSource||building)?.sections)?(aiSource||building).sections:[];
+    const firstWorkflow=sourceWorkflows.find(section=>object(section)&&(section.id==='ai-workflows'||section.kind==='workflow'));
+    if(firstWorkflow&&ai.sections[0]){const current=ai.sections[0];ai.sections[0]={...clone(firstWorkflow),items:current.items};}
+    sourceWorkflows.filter(section=>object(section)&&section.kind==='workflow'&&section!==firstWorkflow).forEach(section=>appendSection(ai,section));
+    if(Array.isArray(aiSource?.sections))aiSource.sections.filter(section=>object(section)&&section.kind!=='workflow'&&section!==firstWorkflow).forEach(section=>appendSection(ai,section));
+    if(Array.isArray(building?.sections))building.sections.forEach(section=>{
+      if(!object(section)||section.kind==='workflow'||section.id==='ai-workflows'||section.id==='social')return;
+      appendSection(portfolio,{...clone(section),kind:'capability'});
+    });
+    // 旧页面的自定义标题和背景继续归属到作品集。
+    if(building&&!oldPortfolio){
+      if(typeof building.name==='string'&&!['Building','作品'].includes(building.name))portfolio.name=building.name;
+      if(typeof building.title==='string'&&!['正在做，\n也正在尝试。','做过的项目'].includes(building.title))portfolio.title=building.title;
+      if(typeof building.subtitle==='string'&&building.subtitle!=='我的内容、作品、代码和自动化流程。')portfolio.subtitle=building.subtitle;
+    }
+    // 无法映射的新建页面也保留，避免只因升级丢失用户内容。
+    const known=new Set(['home','education','experience','capability','ai','life','contact','building']);
+    value.pages.filter(page=>object(page)&&!known.has(page.id)).forEach(page=>{
+      if(!next.pages.some(saved=>saved.id===page.id))next.pages.push(clone(page));
+    });
+  }
+  orderPages();
+  function orderPages(){
+    const ids=['home','education','experience','capability','ai','life','contact'];
+    ids.forEach(ensurePage);
+    next.pages=[...ids.map(id=>next.pages.find(page=>page.id===id)),...next.pages.filter(page=>!ids.includes(page.id))];
+  }
+  const home=ensurePage('home'),homeDefaults=defaultPage('home');
+  const oldTitles=['HELLO,\nI’M YE WEI.','HELLO,\nI\'M YE WEI.'];
+  const oldTags=['做内容，做出海营销，也会自己搭点工具。','达人营销 / 社媒运营 / SEO / AI 工作流'];
+  if(!own(home,'title')||oldTitles.includes(home.title))home.title=homeDefaults.title;
+  if(!own(home,'subtitle')||oldTags.includes(home.subtitle))home.subtitle=homeDefaults.subtitle;
+  if(!own(home,'portraitImage')||home.portraitImage==='assets/yewei-hanging-portrait.png')home.portraitImage=homeDefaults.portraitImage;
+  if(!own(home,'avatarImage'))home.avatarImage=homeDefaults.avatarImage;
+  if(object(next.site)&&oldTags.includes(next.site.tagline))next.site.tagline=defaults.site.tagline;
+  const portfolio=ensurePage('capability'),portfolioDefaults=defaultPage('capability');
+  if(!own(portfolio,'name')||['Capability','运营能力','作品'].includes(portfolio.name))portfolio.name=portfolioDefaults.name;
+  if(!own(portfolio,'title')||['运营能力','Capability','能力与作品'].includes(portfolio.title))portfolio.title=portfolioDefaults.title;
+  if(!own(portfolio,'subtitle')||['达人、社媒与搜索，分别做过什么。','爆款内容 / 品牌账号 / 搜索增长','我的内容、作品、代码和自动化流程。'].includes(portfolio.subtitle))portfolio.subtitle=portfolioDefaults.subtitle;
   return next;
 };

@@ -10,8 +10,18 @@
     return node;
   };
   const main = document.querySelector('#portfolio-main');
-  const pages = ['experience', 'capability', 'ai', 'contact'];
-  const labels = ['EXPERIENCE', 'CAPABILITY', 'AI APPLICATIONS', 'CONTACT'];
+  function journalBlock(section, index, renderItems) {
+    const block = el('section', 'journal-block'); block.id = section.id;
+    if (section.title || section.subtitle) {
+      const heading = el('header', 'work-category-heading');
+      heading.append(el('span', 'portfolio-kicker', String(index + 1).padStart(2, '0')), el('h3', '', section.title || ''));
+      if (section.subtitle) heading.append(el('p', '', section.subtitle));
+      block.append(heading);
+    }
+    block.append(renderItems(section)); return block;
+  }
+  const pages = ['education', 'experience', 'capability', 'ai', 'life', 'contact'];
+  const labels = ['EDUCATION', 'EXPERIENCE', 'PORTFOLIO', 'AI APPLICATIONS', 'LIFE', 'CONTACT'];
   pages.forEach((id, i) => {
     const page = draft.pages.find(x => x.id === id);
     if (!page) return;
@@ -33,23 +43,44 @@
     heading.append(title);
     if (page.subtitle) heading.append(el('p', '', page.subtitle));
     shell.append(heading);
-    if (id === 'experience') {
+    if (id === 'education') {
+      page.sections.forEach((s, index) => shell.append(journalBlock(s, index, ui.educationSection)));
+    } else if (id === 'experience') {
       const grid = el('div', 'experience-grid');
       page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.companyCard(item, index)));
       shell.append(grid);
     } else if (id === 'capability') {
-      const list = el('div', 'capability-list');
-      page.sections.forEach(s => list.append(ui.capability(s)));
+      const tools = el('div', 'portfolio-tools');
+      const edit = el('a', 'section-edit-link', '编辑作品集 ↗'); edit.href = 'editor.html?page=capability'; tools.append(edit); shell.append(tools);
+      const list = el('div', 'portfolio-gallery');
+      page.sections.forEach((s, index) => list.append(ui.portfolioSection(s, index)));
       shell.append(list);
     } else if (id === 'ai') {
       const grid = el('div', 'workbench-grid');
       page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.workflow(item, index)));
       shell.append(grid);
+    } else if (id === 'life') {
+      const tools = el('div', 'portfolio-tools');
+      const edit = el('a', 'section-edit-link', '编辑生活页 ↗'); edit.href = 'editor.html?page=life'; tools.append(edit); shell.append(tools);
+      page.sections.forEach((s, index) => shell.append(journalBlock(s, index, ui.lifeSection)));
     }
     section.append(shell); main.append(section);
   });
   const home = draft.pages.find(x => x.id === 'home');
   if (home?.subtitle) document.querySelector('.hero-intro').textContent = home.subtitle;
+  if (home?.title) {
+    const heading = document.querySelector('.hero h1');
+    const [name, ...motto] = home.title.split('\n');
+    heading.replaceChildren(el('span', 'hero-name', name));
+    if (motto.length) heading.append(el('span', 'hero-motto', motto.join('\n')));
+  }
+  const avatar = ui.safeUrl(home?.avatarImage, true);
+  const portraitImage = ui.safeUrl(home?.portraitImage, true);
+  const avatarNode = document.querySelector('.hero-status img');
+  avatarNode.hidden = !avatar;
+  if (avatar) avatarNode.src = avatar;
+  if (portraitImage) document.querySelector('#portrait-card > img').src = portraitImage;
+  else { document.querySelector('.hanging-photo').hidden = true; document.querySelector('.mobile-cord').hidden = true; }
   const menuButton = document.querySelector('.menu-toggle');
   const menu = document.querySelector('#mobile-menu');
   function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', '打开菜单'); }

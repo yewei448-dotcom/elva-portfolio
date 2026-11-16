@@ -1,9 +1,9 @@
 (() => {
   'use strict';
   const STORAGE_KEY = 'yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeCapabilities.v1';
-  const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '能力与证明' };
-  const PAGE_LABELS = { home: '首页', experience: 'Experience', capability: 'Capability', ai: 'AI应用', contact: '联系方式', building: '作品', life: '生活' };
+  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeEducationLife.v2';
+  const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '作品 / 案例分类' };
+  const PAGE_LABELS = { home: '首页', education: '学历', experience: 'Experience', capability: 'Portfolio', ai: 'AI应用', contact: '联系方式', building: '作品', life: '生活' };
   const MAX_JSON_BYTES = 24 * 1024 * 1024;
   const $ = selector => document.querySelector(selector);
   const els = {
@@ -97,7 +97,7 @@
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
     if (value.structureVersion !== undefined) {
-      if (![1, 2].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
+      if (![1, 2, 3].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
       normalized.structureVersion = value.structureVersion;
     }
     for (const key of ['name', 'tagline', 'phone', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
@@ -124,6 +124,11 @@
         const portraitImage = requireString(page.portraitImage, '悬挂照片', 12 * 1024 * 1024);
         if (!safeUrl(portraitImage, true)) throw new Error('悬挂照片包含不支持的图片地址。');
         np.portraitImage = portraitImage;
+      }
+      if (pid === 'home' || Object.prototype.hasOwnProperty.call(page, 'avatarImage')) {
+        const avatarImage = requireString(page.avatarImage, '首页头像', 12 * 1024 * 1024);
+        if (!safeUrl(avatarImage, true)) throw new Error('首页头像包含不支持的图片地址。');
+        np.avatarImage = avatarImage;
       }
       const sectionIds = new Set();
       for (const section of page.sections) {
@@ -177,7 +182,7 @@
   }
   function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(pushPreview, 120); }
   function backupLegacyDraft(raw, value) {
-    if (!raw || value?.structureVersion === 2) return;
+    if (!raw || value?.structureVersion === 3) return;
     legacyBackupRaw = raw;
     try {
       if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, raw);
@@ -284,7 +289,7 @@
     const wrapper = node('div', 'image-control');
     if (value) {
       const preview = node('div', 'image-control-preview');
-      const image = node('img'); image.src = value; image.alt = options.background ? '当前页面背景' : options.portrait ? '当前悬挂照片' : '当前条目图片';
+      const image = node('img'); image.src = value; image.alt = options.background ? '当前页面背景' : options.avatar ? '当前首页头像' : options.portrait ? '当前悬挂照片' : '当前条目图片';
       image.addEventListener('error', () => { preview.classList.add('image-error'); image.hidden = true; preview.append(node('span', '', '图片暂时无法显示')); }, { once: true });
       preview.append(image); wrapper.append(preview);
     }
@@ -419,6 +424,13 @@
     });
     els.settings.append(pageGroup.details, background.details);
     if (page.id === 'home') {
+      const avatar = group('首页头像', page.avatarImage ? 'AI 形象 · 可替换' : '已隐藏，可重新上传', true);
+      avatar.body.append(imageControl(page.avatarImage || '', value => {
+        const target = draft.pages.find(p => p.id === page.id); if (!target) return;
+        target.avatarImage = value; changed({ render: true });
+      }, { avatar: true }));
+      avatar.body.append(node('small', 'field-hint', '替换或移除头像不会改变悬挂照片。'));
+      els.settings.append(avatar.details);
       const portrait = group('悬挂照片', page.portraitImage ? '首页右侧的个人照片' : '已隐藏，可重新上传', true);
       portrait.body.append(imageControl(page.portraitImage || '', value => {
         const target = draft.pages.find(p => p.id === page.id); if (!target) return;
@@ -526,7 +538,7 @@
     body.append(metricGroup.details);
   }
   function renderLinks(item, body, kind) {
-    const linkGroup = group('关联作品与证明链接', '可填写多个链接；留空可保留位置', ['capability', 'workflow', 'links'].includes(kind));
+    const linkGroup = group('作品与相关链接', '作品、账号、视频或资料；可填写多个链接', ['capability', 'workflow', 'links'].includes(kind));
     const list = node('div', 'proof-links-editor');
     const redraw = () => {
       list.replaceChildren();
@@ -559,18 +571,19 @@
       els.sectionEditor.append(node('div', 'inspector-empty', '选中一个板块，或在上方添加新板块。'));
       return;
     }
+    const portfolioEditing = editingPageId === 'capability' || section.kind === 'capability';
     const title = node('div', 'inspector-heading');
     title.append(node('span', 'inspector-eyebrow', '正在编辑'), node('h2', '', KINDS[section.kind]));
     els.sectionEditor.append(title);
     const sectionFields = node('div', 'section-fields');
     sectionFields.append(
-      field('板块标题', section.title, value => { section.title = value; syncListTitle(section.id, value); changed(); }),
-      field('板块说明', section.subtitle, value => { section.subtitle = value; changed(); }, { multiline: true, rows: 2 }),
+      field(portfolioEditing ? '作品分类标题' : '板块标题', section.title, value => { section.title = value; syncListTitle(section.id, value); changed(); }),
+      field(portfolioEditing ? '分类说明' : '板块说明', section.subtitle, value => { section.subtitle = value; changed(); }, { multiline: true, rows: 2 }),
       field('展示类型', section.kind, value => { section.kind = value; changed(); renderSectionList(); renderSectionEditor(); }, { select: KINDS, hint: '切换展示方式会保留已有内容。' })
     );
     els.sectionEditor.append(sectionFields);
     const itemsHeading = node('div', 'panel-section-heading item-heading');
-    itemsHeading.append(node('h3', '', '内容条目'), node('span', 'count-badge', String(section.items.length)));
+    itemsHeading.append(node('h3', '', portfolioEditing ? '作品与案例' : '内容条目'), node('span', 'count-badge', String(section.items.length)));
     els.sectionEditor.append(itemsHeading);
     if (!section.items.length) els.sectionEditor.append(node('p', 'panel-empty', '还没有内容。添加文字、照片或链接，让这一块完整起来。'));
     section.items.forEach((item, index) => {
@@ -586,7 +599,7 @@
       const up = button('↑ 上移', 'button-quiet', () => moveItem(item.id, -1), `上移条目 ${index + 1}`); up.disabled = index === 0;
       const down = button('↓ 下移', 'button-quiet', () => moveItem(item.id, 1), `下移条目 ${index + 1}`); down.disabled = index === section.items.length - 1;
       toolbar.append(up, down, button('删除', 'button-quiet danger-text', () => removeItem(item.id), `删除条目 ${index + 1}`));
-      const itemLabel = section.kind === 'companies' ? '公司 / 项目名称' : section.kind === 'photo' ? '照片标题' : '标题';
+      const itemLabel = section.kind === 'companies' ? '公司 / 项目名称' : portfolioEditing ? '作品 / 案例名称' : section.kind === 'photo' ? '照片标题' : '标题';
       body.append(toolbar,
         field(itemLabel, item.title, value => { item.title = value; summaryTitle.textContent = value || `未命名条目 ${index + 1}`; changed(); })
       );
@@ -598,33 +611,33 @@
         body.append(companyFields);
       }
       const contactKey = editingPageId === 'contact' && ['phone', 'email', 'wechat'].includes(item.id) ? item.id : '';
-      const descriptionField = field(contactKey === 'phone' ? '电话号码' : contactKey === 'email' ? '邮箱地址' : contactKey === 'wechat' ? '微信号' : section.kind === 'photo' ? '照片说明' : '简短介绍', item.text, (value, input) => {
+      const descriptionField = field(contactKey === 'phone' ? '电话号码' : contactKey === 'email' ? '邮箱地址' : contactKey === 'wechat' ? '微信号' : section.kind === 'photo' ? '照片说明' : portfolioEditing ? '作品 / 案例简介' : '简短介绍', item.text, (value, input) => {
         if (contactKey) syncContactValue(contactKey, value, input); else item.text = value;
         changed();
       }, { multiline: !contactKey, rows: 3, type: contactKey === 'phone' ? 'tel' : 'text' });
       if (contactKey) descriptionField.querySelector('input').dataset.contactField = contactKey;
-      const urlField = field(section.kind === 'videos' ? '视频链接' : '跳转链接', item.url, value => { item.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '留空时不显示外部跳转。' });
+      const urlField = field(portfolioEditing ? '作品 / 案例链接' : section.kind === 'videos' ? '视频链接' : '跳转链接', item.url, value => { item.url = value.trim(); changed(); }, { url: true, placeholder: 'https://…', hint: '留空时不显示外部跳转。' });
       if (contactKey === 'email' || contactKey === 'phone') urlField.querySelector('input').dataset.contactUrl = contactKey;
       body.append(
         field(section.kind === 'companies' ? '补充标签 / 备注' : '标签 / 时间 / 备注', item.meta, value => { item.meta = value; changed(); }, { placeholder: '可选' }),
         descriptionField, urlField
       );
       renderLinks(item, body, section.kind);
-      const imageGroup = group(section.kind === 'companies' ? '公司图片 / 标志' : section.kind === 'videos' ? '视频封面' : '照片 / 封面', item.image ? '已加入图片' : '未添加图片', section.kind === 'photo');
+      const imageGroup = group(section.kind === 'companies' ? '公司图片 / 标志' : portfolioEditing ? '作品图片 / 封面' : section.kind === 'videos' ? '视频封面' : '照片 / 封面', item.image ? '已加入图片' : '未添加图片', section.kind === 'photo');
       imageGroup.body.append(imageControl(item.image, value => {
         const target = draft.pages.find(p => p.id === editingPageId)?.sections.find(s => s.id === section.id)?.items.find(i => i.id === item.id);
         if (!target) return;
         target.image = value; changed(); renderSectionEditor(item.id);
       }));
       body.append(imageGroup.details);
-      const extra = group('详细内容', '点击卡片后显示的正文与步骤', section.kind === 'companies' || section.kind === 'workflow');
-      extra.body.append(field('详细说明', item.details, value => { item.details = value; changed(); }, { multiline: true, rows: section.kind === 'companies' ? 9 : 5, hint: '可以按段落写工作职责、成果或项目过程。' }),
+      const extra = group(portfolioEditing ? '案例内容' : '详细内容', '点击卡片后显示的正文与步骤', section.kind === 'companies' || section.kind === 'workflow');
+      extra.body.append(field(portfolioEditing ? '案例过程 / 补充说明' : '详细说明', item.details, value => { item.details = value; changed(); }, { multiline: true, rows: section.kind === 'companies' ? 9 : 5, hint: portfolioEditing ? '自由填写作品背景、负责的部分或结果。' : '可以按段落写工作职责、成果或项目过程。' }),
         field('流程步骤', (item.steps || []).join('\n'), value => { item.steps = value.split('\n').map(step => step.trim()).filter(Boolean).slice(0, 100); changed(); }, { multiline: true, rows: 3, hint: '每行一个步骤；没有流程时可以留空。', placeholder: '发现问题\n整理流程\n实践验证' }));
       body.append(extra.details);
       if (section.kind === 'companies' || Array.isArray(item.metrics)) renderMetrics(item, body);
       details.append(summary, body); els.sectionEditor.append(details);
     });
-    els.sectionEditor.append(button('＋ 添加内容条目', 'add-item-button', addItem));
+    els.sectionEditor.append(button(portfolioEditing ? '＋ 添加作品 / 案例' : '＋ 添加内容条目', 'add-item-button', addItem));
   }
   function scrollToInspector() {
     requestAnimationFrame(() => els.sectionEditor.scrollIntoView({ behavior: 'smooth', block: 'start' }));

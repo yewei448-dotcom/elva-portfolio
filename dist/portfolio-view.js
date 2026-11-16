@@ -177,6 +177,92 @@
     const proofs = proofLinks(item, true); if (proofs) body.append(proofs);
     card.append(summary, body); return card;
   }
+  function portfolioPiece(item, index, sectionId) {
+    const card = el('details', 'portfolio-piece');
+    const summary = el('summary', 'piece-summary');
+    const cover = el('span', 'piece-cover');
+    const src = safeUrl(item.image, true);
+    if (src) cover.append(image(src, item.title || '作品封面', 'piece-image'));
+    else {
+      const placeholder = el('span', 'piece-placeholder');
+      placeholder.append(el('span', '', String(index + 1).padStart(2, '0')), el('small', '', '封面待补充'));
+      cover.append(placeholder);
+    }
+    const copy = el('span', 'piece-copy');
+    if (item.meta) copy.append(el('span', 'piece-meta', item.meta));
+    copy.append(el('h4', '', item.title || '新作品'));
+    if (item.text) copy.append(el('span', 'piece-description', item.text));
+    const highlight = item.metrics?.find(metric => metric.value);
+    if (highlight) copy.append(el('span', 'piece-highlight', `${highlight.value} · ${highlight.label || '项目成果'}`));
+    const action = el('span', 'piece-action', '查看作品 +'); copy.append(action);
+    summary.append(cover, copy);
+    const body = el('div', 'piece-body');
+    if (item.details) body.append(paragraphs(item.details));
+    if (item.metrics?.length) body.append(metricList(item.metrics));
+    if (item.steps?.length) {
+      const steps = el('ol', 'branch-steps'); item.steps.forEach(step => steps.append(el('li', '', step))); body.append(steps);
+    }
+    const proofs = uniqueLinks(item);
+    const links = el('div', 'proof-links');
+    proofs.forEach(proof => links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')));
+    if (!proofs.length) links.append(link(`editor.html?page=capability&section=${encodeURIComponent(sectionId)}`, '补充作品链接 ↗', 'proof-link'));
+    body.append(links); card.append(summary, body);
+    card.addEventListener('toggle', () => { action.textContent = card.open ? '收起作品 −' : '查看作品 +'; });
+    return card;
+  }
+  function portfolioSection(section, index = 0) {
+    const block = el('section', 'work-category'); block.dataset.sectionId = section.id; block.id = section.id;
+    const heading = el('header', 'work-category-heading');
+    heading.append(el('span', 'portfolio-kicker', String(index + 1).padStart(2, '0')), el('h3', '', section.title || '作品'));
+    if (section.subtitle) heading.append(el('p', '', section.subtitle));
+    const cards = el('div', 'work-cards');
+    (section.items || []).forEach((item, i) => cards.append(portfolioPiece(item, i, section.id)));
+    if (!(section.items || []).length) cards.append(link(`editor.html?page=capability&section=${encodeURIComponent(section.id)}`, '添加第一件作品 ↗', 'section-edit-link'));
+    block.append(heading, cards); return block;
+  }
+  function educationSection(section) {
+    const group = el('div', 'education-list');
+    (section.items || []).forEach((item, index) => {
+      const card = el('article', 'education-card');
+      const top = el('div', 'education-topline');
+      top.append(el('span', 'education-mark', String(index + 1).padStart(2, '0')), el('span', '', 'EDUCATION'));
+      const copy = el('div', 'education-copy');
+      copy.append(el('h3', '', item.title || '学校名称'));
+      if (item.meta) copy.append(el('p', 'education-meta', item.meta));
+      if (item.text) copy.append(paragraphs(item.text));
+      if (item.details) copy.append(paragraphs(item.details, 'portfolio-copy education-detail'));
+      if (item.metrics?.length) copy.append(metricList(item.metrics));
+      const proofs = uniqueLinks(item);
+      proofs.forEach(proof => copy.append(link(proof.url, `${proof.label} ↗`, 'section-edit-link')));
+      card.append(top, copy); group.append(card);
+    }); return group;
+  }
+  function lifeSection(section) {
+    const group = el('div', section.kind === 'photo' ? 'life-gallery' : 'life-notes');
+    (section.items || []).forEach((item, index) => {
+      if (section.kind === 'photo') {
+        const figure = el('figure', 'life-photo');
+        const src = safeUrl(item.image, true);
+        const frame = el('div', 'life-photo-image');
+        if (src) frame.append(image(src, item.title || '生活照片', 'life-image'));
+        else {
+          const placeholder = link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, '', 'life-photo-placeholder');
+          placeholder.append(el('span', '', '+'), el('small', '', '放一张生活照片')); frame.append(placeholder);
+        }
+        figure.append(frame, el('figcaption', '', item.title || `MOMENT ${String(index + 1).padStart(2, '0')}`));
+        if (item.text) figure.append(el('p', 'life-photo-note', item.text));
+        group.append(figure);
+      } else {
+        const note = el('article', 'life-note');
+        note.append(el('h3', '', item.title || '写一点关于自己'));
+        if (item.meta) note.append(el('p', 'piece-meta', item.meta));
+        if (item.text || item.details) note.append(paragraphs([item.text, item.details].filter(Boolean).join('\n\n')));
+        else note.append(link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, '写点什么 ↗', 'section-edit-link'));
+        uniqueLinks(item).forEach(proof => note.append(link(proof.url, `${proof.label} ↗`, 'section-edit-link')));
+        group.append(note);
+      }
+    }); return group;
+  }
   function contacts(section, site = {}) {
     const group = el('div', 'portfolio-contact-links');
     const feedback = el('span', 'contact-feedback'); feedback.hidden = true;
@@ -220,5 +306,5 @@
     footer.append(el('span', '', `${site.name || '叶薇'} / 个人网站`), edit, el('span', '', `© ${new Date().getFullYear()}`));
     scene.append(bar, message, footer); return scene;
   }
-  window.PortfolioUI = { companyCard, capability, workflow, contacts, contactScene, safeUrl };
+  window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, educationSection, lifeSection, contacts, contactScene, safeUrl };
 })();

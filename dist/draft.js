@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const STORAGE_KEY='yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeCapabilities.v1';
+  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeEducationLife.v2';
   document.body.dataset.draftContext='true';
   const params=new URLSearchParams(location.search);
   const embedded=params.get('editor')==='1'&&parent!==window;
@@ -12,7 +12,7 @@
     if(!raw)return null;
     let cached;
     try{cached=JSON.parse(raw);}catch{try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}return null;}
-    if(cached?.structureVersion!==2){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
+    if(cached?.structureVersion!==3){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
     return cached?.schemaVersion===1&&Array.isArray(cached.pages)?migratePhotos(cached):null;
   }
   if(!embedded){try{const cached=readCachedDraft(localStorage.getItem(STORAGE_KEY));if(cached)draft=cached;}catch{}}
@@ -99,7 +99,7 @@
     const lowerOverlay=page.id==='contact'?Math.min(.8,overlay+.1):overlay;
     document.body.style.backgroundImage=bgImage?`linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${lowerOverlay})),url(${JSON.stringify(bgImage)})`:'';
     document.title=`${draft.site?.name||'我的网站'} · ${page.name||'预览'}`;
-    const header=el('header','draft-header');const logo=el('a','draft-logo','yw✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
+    const header=el('header','draft-header');const logo=el('a','draft-logo','Elva✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
     const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');draft.pages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
     header.append(logo,nav);app.append(header);
     const main=el('main','draft-main');
@@ -112,7 +112,15 @@
     const hero=el('div','page-intro');
     const portraitImage=page.id==='home'?safeUrl(page.portraitImage,true):'';
     const intro=portraitImage?el('div','home-intro-copy'):hero;
-    intro.append(el('span','page-eyebrow',`${String(draft.pages.indexOf(page)+1).padStart(2,'0')} / ${page.name||page.id}`),el('h1','',page.title||page.name),el('p','page-subtitle',page.subtitle||''));
+    if(page.id==='home'&&safeUrl(page.avatarImage,true)){
+      const status=el('div','draft-home-avatar');status.append(imageNode(safeUrl(page.avatarImage,true),'Elva AI 插画头像'),el('span','','个人空间'));intro.append(status);
+    }
+    const introTitle=el('h1','',page.title||page.name);
+    if(page.id==='home'){
+      const [name,...motto]=(page.title||page.name).split('\n');introTitle.replaceChildren(el('span','hero-name',name));if(motto.length)introTitle.append(el('span','hero-motto',motto.join('\n')));
+    }
+    const chapterNumber=page.id==='home'?0:draft.pages.filter(p=>p.id!=='home').indexOf(page)+1;
+    intro.append(el('span','page-eyebrow',`${String(chapterNumber).padStart(2,'0')} / ${page.name||page.id}`),introTitle,el('p','page-subtitle',page.subtitle||''));
     if(portraitImage){
       hero.classList.add('home-intro');hero.append(intro);
       const hanging=el('figure','home-hanging-photo');
@@ -126,19 +134,28 @@
     }
     main.append(hero);
     (page.sections||[]).slice(0,100).forEach((section,index)=>{
-      const sharedCapability=section.kind==='capability'&&typeof window.PortfolioUI?.capability==='function';
-      const block=sharedCapability?window.PortfolioUI.capability(section):el('section');
+      const sharedPortfolio=page.id==='capability'&&typeof window.PortfolioUI?.portfolioSection==='function';
+      const sharedEducation=page.id==='education'&&typeof window.PortfolioUI?.educationSection==='function';
+      const sharedLife=page.id==='life'&&typeof window.PortfolioUI?.lifeSection==='function';
+      const sharedCapability=!sharedPortfolio&&section.kind==='capability'&&typeof window.PortfolioUI?.capability==='function';
+      const block=sharedPortfolio?window.PortfolioUI.portfolioSection(section,index):sharedCapability?window.PortfolioUI.capability(section):el('section');
       block.classList.add('draft-section',`block-${section.kind||'text'}`);block.dataset.sectionId=section.id;block.id=section.id;
       if(embedded){
         const select=()=>send({type:'yewei-draft:select',sectionId:section.id,pageId:page.id});
         const edit=el('button','edit-section','编辑此板块');edit.type='button';edit.addEventListener('click',event=>{event.stopPropagation();select();});
         const summary=sharedCapability?block.querySelector('summary'):null;
         if(summary)summary.append(edit);else block.append(edit);
-        block.addEventListener('click',select);
+        block.addEventListener('click',event=>{
+          const anchor=event.target instanceof Element?event.target.closest('a'):null;
+          if(anchor?.getAttribute('href')?.startsWith('editor.html'))event.preventDefault();
+          select();
+        });
       }
-      if(!sharedCapability){
+      if(!sharedCapability&&!sharedPortfolio){
         const heading=el('div','block-heading');heading.append(el('span','block-number',String(index+1).padStart(2,'0')),el('h2','',section.title||'新板块'));block.append(heading);if(section.subtitle)block.append(el('p','block-subtitle',section.subtitle));
-        if(page.id==='contact'&&section.kind==='links'&&typeof window.PortfolioUI?.contacts==='function')block.append(window.PortfolioUI.contacts(section,draft.site));
+        if(sharedEducation)block.append(window.PortfolioUI.educationSection(section));
+        else if(sharedLife)block.append(window.PortfolioUI.lifeSection(section));
+        else if(page.id==='contact'&&section.kind==='links'&&typeof window.PortfolioUI?.contacts==='function')block.append(window.PortfolioUI.contacts(section,draft.site));
         else{
           const items=el('div',`block-items ${section.kind||'text'}-items`);(section.items||[]).slice(0,500).forEach((item,i)=>items.append(renderItem(item,section.kind,i)));if(!items.childNodes.length)items.append(el('p','empty-block','这里还没有内容，可以在编辑面板添加。'));block.append(items);
         }
