@@ -19,6 +19,16 @@
     if (!page || page.archived) return;
     const section = el('section', `portfolio-section section paper portfolio-${id}`); section.id = id;
     const shell = el('div', 'section-shell');
+    if (id === 'capability') {
+      const bg = page.background || {};
+      const image = ui.safeUrl(bg.image, true);
+      if (image) {
+        const overlay = Math.max(0, Math.min(.8, Number(bg.overlay) || 0));
+        section.classList.remove('paper'); section.classList.add('has-scenery');
+        section.style.backgroundColor = /^#[0-9a-f]{3,8}$/i.test(bg.color || '') ? bg.color : '#c4dee2';
+        section.style.backgroundImage = `linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${overlay})),url(${JSON.stringify(image)})`;
+      }
+    }
     if (id === 'contact') {
       section.classList.remove('paper'); section.classList.add('photo-finale');
       const bg = page.background || {};

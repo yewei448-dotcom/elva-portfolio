@@ -194,9 +194,9 @@ window.websiteDefaults = {
       "title": "能力",
       "subtitle": "案例、内容与合作。",
       "background": {
-        "color": "#fbfaf5",
-        "image": "",
-        "overlay": 0.12
+        "color": "#c4dee2",
+        "image": "assets/capabilities-meadow.jpg",
+        "overlay": 0.04
       },
       "sections": [
         {
@@ -1368,13 +1368,20 @@ window.migrateWebsiteDraftPhotos = function(value, options) {
   const result = migrateWebsiteDraftWithoutRetiredResources(value, options);
   function clean(draft) {
     if (!draft || !Array.isArray(draft.pages)) return draft;
-    return {...draft, pages: draft.pages.map(page => page.id !== 'ai' ? page : {...page,
+    return {...draft, pages: draft.pages.map(page => {
+      if (page.id === 'capability') {
+        const bg = page.background;
+        if (bg && bg.color === '#fbfaf5' && bg.image === '' && bg.overlay === 0.12)
+          return {...page, background: {...window.websiteDefaults.pages.find(p => p.id === 'capability').background}};
+        return page;
+      }
+      return page.id !== 'ai' ? page : {...page,
       sections: (page.sections || []).flatMap(section => {
         if (section.id !== 'ai-resources') return [section];
         const items = (section.items || []).filter(item => item.id !== 'github');
         return items.length ? [{...section, items}] : [];
       })
-    })};
+    };})};
   }
   const next = clean(result);
   if (next?.localizations?.en) next.localizations = {...next.localizations, en: clean(next.localizations.en)};

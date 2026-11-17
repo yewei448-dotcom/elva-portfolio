@@ -270,6 +270,25 @@ h1, h2, h3, h4, h5, h6,
 .ai-resource-card:hover > .resource-arrow { transform: translate(2px,-2px); opacity: 1; }
 .ai-resource-links > .ai-resource-card:focus-visible { outline: 2px solid #6c91a4; outline-offset: 4px; }
 
+/* A roomier capability chapter on the reference's blue-sky lawn. */
+.portfolio-capability.has-scenery {
+  min-height: clamp(360px,54svh,620px);
+  padding-block: 72px 84px;
+  background-size: cover;
+  background-position: center 58%;
+  background-repeat: no-repeat;
+}
+.portfolio-capability.has-scenery .portfolio-kicker { color: #35576b; }
+.portfolio-capability.has-scenery .capabilities-trigger {
+  border-color: rgba(255,255,255,.8);
+  background: rgba(255,255,255,.76);
+}
+body[data-page="capability"].has-background-image {
+  background-position: center 58%;
+  background-size: cover;
+  background-attachment: scroll;
+}
+
 /* Education and personality now share the photograph's narrow bottom line. */
 .id-bottom, .home-photo-bottom {
   display: flex;
@@ -316,6 +335,7 @@ h1, h2, h3, h4, h5, h6,
 }
 @media(max-width:560px) {
   .portfolio-capability { padding-block: 44px; }
+  .portfolio-capability.has-scenery { min-height: 380px; padding-block: 58px 68px; }
   .id-bottom, .home-photo-bottom { gap: 6px; margin-top: 8px; padding-top: 7px; font-size: 7px; letter-spacing: 0; }
   .id-bottom > span:first-child, .home-photo-bottom > span:first-child { max-width: 78%; }
   .id-bottom > span:last-child, .home-photo-bottom > span:last-child { font-size: 7px; }
