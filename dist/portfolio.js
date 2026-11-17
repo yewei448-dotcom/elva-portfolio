@@ -33,15 +33,12 @@
     const title = el('div');
     title.append(el('span', 'portfolio-kicker', `${String(i + 1).padStart(2, '0')} / ${labels[i]}`), el('h2', '', page.title));
     heading.append(title);
-    if (page.subtitle && id !== 'ai') heading.append(el('p', '', page.subtitle));
     shell.append(heading);
     if (id === 'experience') {
       const grid = el('div', 'experience-grid');
       page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.companyCard(item, index)));
       shell.append(grid);
     } else if (id === 'capability') {
-      const tools = el('div', 'portfolio-tools');
-      const edit = el('a', 'section-edit-link', copy('编辑能力案例 ↗', 'Edit capability cases ↗')); edit.href = `editor.html?page=capability&lang=${language}`; tools.append(edit); shell.append(tools);
       const list = el('div', 'portfolio-gallery');
       page.sections.forEach((s, index) => list.append(ui.portfolioSection(s, index)));
       shell.append(ui.capabilityReveal(list));
@@ -77,8 +74,6 @@
   document.querySelector('.hero-status > span:last-child').textContent = home?.statusText ?? copy('探索世界中', 'Exploring the world');
   document.querySelector('.id-bottom > span:first-child').textContent = home?.portraitFooterLeft ?? copy('西南财经大学硕士', 'SWUFE · Master’s');
   document.querySelector('.id-bottom > span:last-child').textContent = home?.portraitFooterRight ?? 'ENTP';
-  document.querySelector('.hero-button').firstChild.textContent = copy('往下逛逛 ', 'Explore ');
-  document.querySelector('.hero-foot > span').textContent = home?.subtitle ?? draft.site.tagline ?? '';
   document.querySelector('.skip-link').textContent = copy('跳到主要内容', 'Skip to content');
   document.querySelector('.desktop-nav').setAttribute('aria-label', copy('主导航', 'Main navigation'));
   document.querySelector('.logo').setAttribute('aria-label', copy('Elva 首页', 'Elva home'));

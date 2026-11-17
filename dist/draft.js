@@ -134,7 +134,7 @@
     }
     const chapterNumber=page.id==='home'?0:visiblePages.filter(p=>p.id!=='home').indexOf(page)+1;
     intro.append(el('span','page-eyebrow',`${String(chapterNumber).padStart(2,'0')} / ${page.name||page.id}`),introTitle);
-    if(page.id==='ai')intro.append(window.PortfolioUI.aiStatement(page.subtitle));else intro.append(el('p','page-subtitle',page.subtitle||''));
+    if(page.id==='ai')intro.append(window.PortfolioUI.aiStatement(page.subtitle));else if(!['experience','capability'].includes(page.id))intro.append(el('p','page-subtitle',page.subtitle||''));
     if(portraitImage){
       hero.classList.add('home-intro');hero.append(intro);
       const hanging=el('figure','home-hanging-photo');

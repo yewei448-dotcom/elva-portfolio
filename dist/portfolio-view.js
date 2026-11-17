@@ -362,7 +362,7 @@
     const footer = el('footer', 'contact-signature');
     const edit = link('editor.html?page=contact', textFor('编辑 ↗', 'Edit ↗'), 'contact-edit');
     if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
-    footer.append(el('span', '', `${site.name || 'Elva'} / ${textFor('个人网站', 'Personal website')}`), edit, el('span', '', `© ${new Date().getFullYear()}`));
+    footer.append(el('span', '', '叶薇/Elva'), edit, el('span', '', `© ${new Date().getFullYear()}`));
     scene.append(bar, message, footer); return scene;
   }
   window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, capabilityReveal, aiStatement, resourceLinks, educationSection, lifeSection, contacts, contactScene, safeUrl };
