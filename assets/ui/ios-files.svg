@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>文件</title>
+  <defs>
+    <linearGradient id="files-paper" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#fff"/><stop offset="1" stop-color="#f4f6f9"/>
+    </linearGradient>
+    <linearGradient id="files-back" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#71c5ff"/><stop offset="1" stop-color="#2c91ef"/>
+    </linearGradient>
+    <linearGradient id="files-front" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#82d0ff"/><stop offset="1" stop-color="#258ce8"/>
+    </linearGradient>
+    <filter id="files-shadow" x="-15%" y="-12%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.3" flood-color="#27343a" flood-opacity=".22"/>
+    </filter>
+    <filter id="files-folder-shadow" x="-10%" y="-15%" width="120%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="1" stdDeviation=".7" flood-color="#1c76bd" flood-opacity=".2"/>
+    </filter>
+  </defs>
+  <rect x="4" y="3" width="56" height="56" rx="11" fill="url(#files-paper)" filter="url(#files-shadow)"/>
+  <g filter="url(#files-folder-shadow)">
+    <path d="M12 24v-3c0-2 1.5-3.5 3.5-3.5H26c1 0 1.8.4 2.4 1.2l2.2 2.8h17.9c2 0 3.5 1.5 3.5 3.5v19.5c0 2-1.5 3.5-3.5 3.5h-33c-2 0-3.5-1.5-3.5-3.5Z" fill="url(#files-back)"/>
+    <path d="M12.9 26.5h38.2c1.2 0 2.1 1 2 2.2l-1.7 17.9c-.1 1.5-1.4 2.6-2.9 2.6h-33c-1.5 0-2.8-1.1-2.9-2.6l-1.7-17.9c-.1-1.2.8-2.2 2-2.2Z" fill="url(#files-front)"/>
+    <path d="M13 27.5h38" stroke="#bce8ff" stroke-opacity=".8" stroke-linecap="round"/>
+  </g>
+  <path d="M5 10c2-5 5-6 10-6h34c5 0 8 1 10 6" fill="none" stroke="#fff" stroke-opacity=".9"/>
+</svg>

@@ -1,0 +1,40 @@
+/* One bold sans-serif voice throughout the site, with native Chinese fallbacks. */
+:root {
+  --sans: "Manrope", "Arial", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --serif: var(--sans);
+  --mono: var(--sans);
+}
+body { font-family: var(--sans); font-weight: 500; }
+button, input, select, textarea { font-family: inherit; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--sans); font-weight: 900; font-style: normal; }
+strong, b { font-weight: 800; }
+.hero h1, .hero h1 em, .home-intro-copy h1 {
+  font-family: var(--sans);
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -.065em;
+}
+.logo, .draft-logo, .serif, .handwriting {
+  font-family: var(--sans);
+  font-weight: 850;
+  font-style: normal;
+}
+.section h2, .page-intro h1, .about-copy h3, .timeline-title strong,
+.project-info strong, .block-heading h2, .card-copy h3, #case-title, #detail-title {
+  font-family: var(--sans);
+  font-weight: 850;
+  font-style: normal;
+  letter-spacing: -.035em;
+}
+.micro, .section-label, .page-eyebrow, .block-number,
+.case-eyebrow, .item-meta, .company-meta, .detail-meta,
+.timeline-period, .account-window-bar, .account-art-bottom {
+  font-family: var(--sans);
+  font-weight: 700;
+}
+.portfolio-metrics strong, .case-metrics strong, .detail-metrics strong,
+.proof-link, .social-account-link > strong { font-family: var(--sans); font-weight: 800; }
+@media (max-width: 560px) {
+  .hero h1, .home-intro-copy h1 { letter-spacing: -.06em; }
+  .section h2, .page-intro h1 { letter-spacing: -.035em; }
+}

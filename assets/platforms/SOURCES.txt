@@ -1,0 +1,30 @@
+Platform portfolio cover sources — 2026-11-17
+
+All four covers have an original 1600 x 1000 (16:10) layout. Icon path geometry is copied unmodified from the official Simple Icons repository. The platform captions are separate ordinary text labels, not recreated wordmarks. No AI-generated logo artwork, third-party fonts, remote images, scripts, or external runtime dependencies.
+
+Simple Icons repository: https://github.com/simple-icons/simple-icons
+License: CC0-1.0, https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md
+Trademarks remain with their respective owners; these covers identify the platforms used in the portfolio.
+
+tiktok
+Source: https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/tiktok.svg
+Original SVG SHA-256: 6f54ac8d325faacea8935bdc44cbed60206a6b408641799e5fea1cba7c1a0af7
+
+youtube
+Source: https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/youtube.svg
+Original SVG SHA-256: 5038808acbbc4e6edda16cbeb1cc6dec80e4e4ee4e227e039c41229fa222aa8c
+
+google
+Source: https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/google.svg
+Original SVG SHA-256: d8cf9fb2d5e234e03254f1d6400d8cc8160c309b010d031a64f37084b5a21d01
+
+Local cover mappings and presentation:
+- douyin-cover.svg: TikTok/Douyin shared musical-note silhouette from Simple Icons tiktok.svg; explicit separate captions “抖音” and “DOUYIN”. White on black. This is not an asserted official Douyin wordmark asset.
+- tiktok-cover.svg: Simple Icons tiktok.svg, white on black, separate “TikTok” caption.
+- youtube-cover.svg: Simple Icons youtube.svg, red #FF0000 on white, separate “YouTube” caption.
+- google-cover.svg: Simple Icons google.svg, monochrome Google G in brand blue #4285F4 on white, separate “Google” caption.
+
+xiaohongshu-flowers.png:
+User-supplied second attachment copied byte-for-byte, without cropping, resizing, recoloring, or editing.
+Source filename: Screenshot 2026-11-17 at 10.13.06.png
+Original/asset SHA-256: 0c0cf2ea570887989ec855f5b497b2dadab7d8edcda778c816b683c986813c43

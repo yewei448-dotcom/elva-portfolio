@@ -1,0 +1,82 @@
+/* A full-screen cover, a photo finale and a small iPhone-style dock. */
+html { scroll-padding-top: 0; }
+.hero { height: 100svh; min-height: 100svh; max-height: none; }
+.hanging-photo { --card-top: clamp(186px,28svh,415px); height: 100%; }
+.hanging-photo .id-card { top: var(--card-top); }
+.hanging-photo .lanyard { top: 0; height: calc(var(--card-top) - 8px); transform: none; }
+.hanging-photo .badge-clip { top: calc(var(--card-top) - 21px); }
+.hero h1 em { font-style: normal; }
+.hero-intro { max-width: 360px; }
+.ios-dock { padding: 10px 15px 11px; gap: 15px; border-radius: 26px; background: #ffffff54; border: 1px solid #ffffffa8; box-shadow: 0 10px 32px #13241e26,inset 0 1px 0 #ffffffe0; backdrop-filter: blur(24px) saturate(1.5); -webkit-backdrop-filter: blur(24px) saturate(1.5); }
+.ios-dock .dock-item { width: 60px; height: 60px; transform-origin: 50% 100%; }
+.ios-app-icon { display: block; width: 60px; height: 60px; border-radius: 15px; filter: drop-shadow(0 3px 4px #15211b22); }
+.ios-app-icon img { width: 100%; height: 100%; max-width: none; pointer-events: none; user-select: none; }
+.ios-dock .dock-item.is-active::after { display: none; }
+.ios-dock .dock-item:hover, .ios-dock .dock-item:focus-visible { transform: translateY(-5px) scale(1.08); }
+.ios-dock .dock-tooltip { font-family: var(--sans); font-weight: 700; }
+.photo-finale { padding: 0; isolation: isolate; background-size: cover; background-position: center 60%; background-repeat: no-repeat; overflow: hidden; }
+.contact-scene { color: var(--ink); min-height: 100svh; display: flex; flex-direction: column; padding: 42px 0 114px; position: relative; }
+.has-photo .contact-scene, body[data-page="contact"].has-background-image .contact-scene { color: #fff; }
+.contact-topbar { display: flex; align-items: start; justify-content: space-between; gap: 25px; }
+.contact-scene .portfolio-contact-links { display: flex; align-items: center; gap: 12px; border: 0; position: relative; }
+.portfolio-contact-icon { width: 49px; height: 49px; display: inline-flex; align-items: center; justify-content: center; padding: 0; background: #fffffff0; border: 1px solid #ffffffb3; border-radius: 14px; box-shadow: 0 5px 13px #13251e26; cursor: pointer; transition: transform .2s,background .2s; }
+.portfolio-contact-icon img { width: 25px; height: 25px; pointer-events: none; }
+.portfolio-contact-icon:hover, .portfolio-contact-icon:focus-visible { background: #fff; transform: translateY(-3px); }
+.portfolio-contact-icon:focus-visible { outline: 3px solid #4a83ca; outline-offset: 4px; }
+.contact-feedback { position: absolute; top: 62px; left: 0; white-space: nowrap; padding: 8px 12px; background: #fff; color: #1a1a1a; border-radius: 7px; font: 600 11px/1.5 var(--sans); box-shadow: 0 5px 12px #13251e26; }
+.contact-feedback[hidden] { display: none; }
+.contact-back { color: inherit; border: 1px solid #ffffff80; border-radius: 12px; padding: 13px 17px; font: 700 10px/1.6 var(--sans); backdrop-filter: blur(12px); background: #ffffff0d; }
+.photo-finale:not(.has-photo) .contact-back, body[data-page="contact"]:not(.has-background-image) .contact-back { border-color: #25252566; }
+.contact-message { margin-top: auto; padding-top: 94px; margin-bottom: 27px; }
+.contact-scene .contact-message h2 { font: 900 clamp(60px,7.4vw,112px)/.99 var(--sans); letter-spacing: -.065em; white-space: pre-line; max-width: 11em; text-wrap: balance; }
+.contact-signature { display: flex; flex-wrap: wrap; align-items: center; gap: 17px; font: 700 10px/1.6 var(--sans); color: inherit; opacity: .9; }
+.contact-signature > :last-child { margin-left: auto; }
+.contact-signature a { text-decoration: underline; text-underline-offset: 4px; }
+body[data-page="contact"] { background-position: center 60%; }
+body[data-page="contact"] .draft-header { display: none; }
+.draft-main.contact-preview-main { width: min(1100px,calc(100% - 90px)); }
+body[data-page="home"] .page-intro.home-intro { min-height: calc(100svh - 96px); }
+@media(max-width:800px) and (min-width:561px) {
+  .hanging-photo { top: 0; }
+  .hero-copy { width: 64%; }
+  body[data-page="home"] .page-intro.home-intro { min-height: calc(100svh - 96px); }
+}
+@media(max-width:560px) {
+  .hero { height: 100svh; min-height: 100svh; }
+  .hero-status { top: clamp(91px,13svh,115px); }
+  .hero-copy { top: clamp(143px,22svh,190px); width: calc(100% - 46px); }
+  .hero h1 { font-size: clamp(44px,12.1vw,66px); line-height: .94; }
+  .hero-intro { max-width: 280px; margin-top: 18px; font-size: 11px; line-height: 1.7; }
+  .hero-button { margin-top: 17px; }
+  .hanging-photo { width: 150px; right: 40px; top: 52svh; height: auto; }
+  .hanging-photo .id-card { top: 0; width: 150px; }
+  .hanging-photo .id-card > img { height: 168px; }
+  .hanging-photo .badge-clip { top: -20px; }
+  .mobile-cord { right: 15px; width: 100px; height: calc(52svh - 13px); }
+  .ios-dock { gap: 11px; padding: 9px 12px; border-radius: 24px; bottom: max(13px,env(safe-area-inset-bottom)); }
+  .ios-dock .dock-item, .ios-app-icon { width: 48px; height: 48px; }
+  .ios-app-icon { border-radius: 12px; }
+  .contact-scene { padding: 28px 0 110px; }
+  .contact-topbar { gap: 15px; }
+  .contact-scene .portfolio-contact-links { gap: 9px; }
+  .portfolio-contact-icon { width: 42px; height: 42px; border-radius: 12px; }
+  .portfolio-contact-icon img { width: 23px; height: 23px; }
+  .contact-back { padding: 11px 12px; font-size: 9px; }
+  .contact-message { padding-top: 80px; margin-bottom: 22px; }
+  .contact-scene .contact-message h2 { font-size: clamp(43px,10.8vw,61px); line-height: 1.06; letter-spacing: -.06em; max-width: 100%; }
+  .contact-signature { font-size: 8px; gap: 12px; }
+  .draft-main.contact-preview-main { width: calc(100% - 40px); }
+  body[data-page="home"] .page-intro.home-intro { min-height: calc(100svh - 80px); }
+}
+@media(max-height:620px) and (min-width:561px) {
+  .hero-status { top: 106px; }
+  .hero-copy { top: 31%; }
+  .hero h1 { font-size: clamp(56px,7vw,86px); }
+  .hero-intro { margin-top: 15px; }
+  .hero-button { margin-top: 15px; }
+  .contact-scene { padding-top: 25px; padding-bottom: 94px; }
+  .contact-message { padding-top: 35px; }
+  .contact-scene .contact-message h2 { font-size: 64px; }
+}
+@media(hover:none) { .ios-dock .dock-item:hover { transform: none; } }
+@media(prefers-reduced-motion:reduce) { .portfolio-contact-icon { transition: none; } }

@@ -1,0 +1,76 @@
+Official Google Fonts assets — retrieved 2026-11-17
+
+Inter Tight
+Local: inter-tight-latin-variable.woff2
+Official source CSS: https://fonts.googleapis.com/css2?family=Inter+Tight:wght@100..900&display=swap
+Official selected Latin WOFF2: https://fonts.gstatic.com/s/intertight/v9/NGSwv5HMAFg6IuGlBNMjxLsH8ahuQ2e8.woff2
+Repository: https://github.com/google/fonts/tree/main/ofl/intertight
+Style: normal. Variable weight: 100–900. Size: 44916 bytes.
+The Latin subset supports English and Latin-1 diacritics; pair it with Chinese fallback fonts.
+License: SIL Open Font License 1.1, copied verbatim to Inter-Tight-OFL.txt.
+License source: https://raw.githubusercontent.com/google/fonts/main/ofl/intertight/OFL.txt
+
+Noto Sans SC
+Public predefined Unicode chunks, downloaded unmodified from Google's own CDN. No text= query, site content or user-provided text was sent to Google Fonts. Standard public family stylesheet: https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap
+Selected by local-only unicode-range comparison, covering 73 characters in the supplied new headings/navigation. Also retains all other glyphs already included in those public chunks.
+All Noto chunks together: 584912 bytes (571.2 KiB), below 5 MB.
+Style: normal. Variable weight: 100–900.
+Repository: https://github.com/google/fonts/tree/main/ofl/notosanssc
+License: SIL Open Font License 1.1, copied verbatim to Noto-Sans-SC-OFL.txt.
+License source: https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/OFL.txt
+Ready-to-copy @font-face declarations with the original official unicode-range values: Noto-Sans-SC-fontfaces.txt. Use family 'Noto Sans SC Local'; keep PingFang SC / Microsoft YaHei as fallback for glyphs not covered by these public chunks.
+No font installation, local font editing or format conversion was performed.
+
+Asset provenance (original Google CDN URL, byte size, SHA-256):
+
+noto-sans-sc-108-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.108.woff2
+64264 bytes
+SHA-256 8fd5870c4b22c2015c5a54a02ea9fec7c0102abff26599cf4b03cd2aaf3f58c5
+
+noto-sans-sc-109-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.109.woff2
+60196 bytes
+SHA-256 35dddbc7b5c78f1dfaee0c9eb8852432a46fee2e9b05ede476b9c47890fa1ed4
+
+noto-sans-sc-110-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.110.woff2
+61192 bytes
+SHA-256 d32e7ca8037160ed0dabff758b75da2a39722fbc49567bb1dc11436da39d61f7
+
+noto-sans-sc-112-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.112.woff2
+57436 bytes
+SHA-256 9efef22fce6ed4d723ce957f7616e6c280689406b54f3c89bfd8833e3a0312e7
+
+noto-sans-sc-113-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.113.woff2
+58440 bytes
+SHA-256 2a169d8dc2ebf18d4ba3a646b7926e2ea8f03371daa8a33aa5aa4e222a30fcb4
+
+noto-sans-sc-115-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.115.woff2
+56212 bytes
+SHA-256 2938d56727e9fe32bd83c6410aef59ed9af9528f23fa224a3413538d8231a842
+
+noto-sans-sc-116-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.116.woff2
+52800 bytes
+SHA-256 98f590f9f68914d4e439e6151a85a4f1cba30a66e904305a74f81a3f470dd044
+
+noto-sans-sc-117-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.117.woff2
+52252 bytes
+SHA-256 3a2247284b74fa6a2ccd10107365f259a00744041551363476b92318f434339e
+
+noto-sans-sc-118-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.118.woff2
+45884 bytes
+SHA-256 4b594f04215780f690da15990ef2a1e5ac82f2f3a4d9cb91713d83d379c983f6
+
+noto-sans-sc-119-variable.woff2
+https://fonts.gstatic.com/s/notosanssc/v41/k3kXo84MPvpLmixcA63oeALhLIiP-Q-87KaAaH7rzeAODp22mF0qmF4CSjmPC6A0Rg5g1igg1w.119.woff2
+76236 bytes
+SHA-256 6d088e37bdc27339bb4c82d4bfe0966849df0cef5872fc99b81025f2488f42d8
+
+Inter Tight SHA-256 83d548cd73ef2e039167db3adb5ea9d7a7870466ffc8a162c9820bc348938aaf

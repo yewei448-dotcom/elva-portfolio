@@ -1,0 +1,358 @@
+/* First-screen navigation and contact details, isolated from the page components. */
+.hero > .site-header {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  column-gap: 26px;
+  width: calc(100% - 48px);
+  height: 82px;
+  min-height: 82px;
+  margin: 18px auto 0;
+  padding: 0 24px;
+  color: #20312a;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 20px;
+  background: linear-gradient(135deg,rgba(255,255,255,.77),rgba(255,255,255,.56));
+  box-shadow: 0 8px 30px rgba(23,43,52,.085),inset 0 1px 0 rgba(255,255,255,.86);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  backdrop-filter: blur(22px) saturate(130%);
+  position: relative;
+  z-index: 40;
+}
+.hero > .site-header > .logo {
+  color: #1e3028;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -2px;
+  text-shadow: none;
+}
+.hero > .site-header > .logo span { color: #7c9185; }
+.hero > .site-header .desktop-nav {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: clamp(3px,.7vw,11px);
+  min-width: 0;
+  width: auto;
+  font: 800 12px/1.4 var(--sans);
+}
+.hero > .site-header .desktop-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 37px;
+  padding: 9px 12px;
+  color: #33483c;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  white-space: nowrap;
+  text-shadow: none;
+  transition: color .2s,background .2s,border-color .2s,box-shadow .2s;
+}
+.hero > .site-header .desktop-nav a::after { display: none; }
+.hero > .site-header .desktop-nav a:hover {
+  color: #1b3024;
+  background: rgba(255,255,255,.42);
+  border-color: rgba(255,255,255,.46);
+}
+.hero > .site-header .desktop-nav a:is(.is-active,.active,[aria-current]) {
+  color: #152a1e;
+  background: rgba(255,255,255,.86);
+  border-color: rgba(255,255,255,.9);
+  box-shadow: 0 3px 9px rgba(30,54,43,.055),inset 0 1px 0 #fff;
+}
+.hero > .site-header .desktop-nav a:focus-visible,
+.hero > .site-header > .language-toggle:focus-visible {
+  outline: 2px solid #728f9f;
+  outline-offset: 3px;
+}
+.hero > .site-header > .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  justify-self: end;
+  width: auto;
+  min-width: 65px;
+  min-height: 36px;
+  padding: 8px 11px;
+  color: #344e40;
+  border: 1px solid rgba(133,155,144,.28);
+  border-radius: 11px;
+  background: rgba(255,255,255,.52);
+  font: 800 10px/1.4 var(--sans);
+  letter-spacing: .2px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s,border-color .2s;
+}
+.hero > .site-header > .language-toggle:hover {
+  background: rgba(255,255,255,.93);
+  border-color: rgba(133,155,144,.44);
+}
+.hero > .site-header > .menu-toggle { display: none !important; }
+
+/* A contact tooltip belongs to its own icon, with a safe edge on small screens. */
+.contact-scene .portfolio-contact-links { z-index: 8; overflow: visible; }
+.contact-scene .portfolio-contact-links > .contact-icon-wrap {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 49px;
+  width: 49px;
+  height: 49px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.contact-scene .contact-icon-wrap:is(:hover,:focus-within) { z-index: 60; }
+.contact-scene .contact-icon-wrap > .portfolio-contact-icon {
+  flex: 0 0 49px;
+  width: 49px;
+  height: 49px;
+}
+.contact-scene .contact-icon-wrap > .contact-tooltip {
+  display: flex;
+  position: absolute;
+  top: calc(100% + 13px);
+  left: 50%;
+  z-index: 70;
+  flex-direction: column;
+  gap: 6px;
+  width: max-content;
+  min-width: 138px;
+  max-width: min(252px,calc(100vw - 48px));
+  padding: 12px 14px 13px;
+  color: #24352b;
+  border: 1px solid rgba(255,255,255,.87);
+  border-radius: 13px;
+  background: linear-gradient(145deg,rgba(255,255,255,.94),rgba(255,255,255,.84));
+  box-shadow: 0 12px 28px rgba(19,39,30,.13),inset 0 1px 0 #fff;
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%,7px);
+  transition: opacity .18s,transform .18s,visibility .18s;
+}
+.contact-scene .contact-icon-wrap > .contact-tooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: calc(50% - 5px);
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid rgba(255,255,255,.9);
+  border-left: 1px solid rgba(255,255,255,.9);
+  background: rgba(255,255,255,.95);
+  transform: rotate(45deg);
+}
+.contact-scene .contact-icon-wrap:is(:hover,:focus-within) > .contact-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%,0);
+}
+.contact-scene .contact-tooltip-label {
+  display: block;
+  color: #87968a;
+  font: 750 8px/1.5 var(--sans);
+  letter-spacing: 1px;
+}
+.contact-scene .contact-tooltip-value {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  color: #24352b;
+  font: 750 12px/1.65 var(--sans);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.contact-scene .contact-icon-wrap > .contact-email + .contact-tooltip .contact-tooltip-value {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.contact-scene .portfolio-contact-links > .contact-feedback {
+  top: calc(100% + 116px);
+  left: 0;
+  z-index: 75;
+  max-width: min(310px,calc(100vw - 40px));
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: #24352b;
+  border: 1px solid rgba(255,255,255,.85);
+  border-radius: 11px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 9px 24px rgba(19,39,30,.13);
+}
+.contact-scene .education-contact-hint {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  width: fit-content;
+  gap: 8px;
+  color: inherit;
+  font: 650 9px/1.7 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: currentColor;
+  overflow-wrap: anywhere;
+  opacity: .8;
+}
+.contact-scene .education-contact-hint:hover,
+.contact-scene .education-contact-hint:focus-visible { opacity: 1; }
+
+/* The editor's language control remains separate from the public header styles. */
+.editor-topbar #editor-language {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 64px;
+  min-height: 33px;
+  margin: 0;
+  padding: 7px 10px;
+  color: #586b50;
+  border: 1px solid #d8dfd0;
+  border-radius: 7px;
+  background: #fffefa;
+  font: 750 10px/1.5 var(--editor-font,var(--sans,sans-serif));
+  white-space: nowrap;
+  cursor: pointer;
+}
+.editor-topbar #editor-language:hover { border-color: #b7c7a8; background: #f1f5eb; }
+.editor-topbar #editor-language:focus-visible { outline: 2px solid #a3b294; outline-offset: 3px; }
+
+@media(max-width:1100px) {
+  .hero > .site-header { width: calc(100% - 36px); padding-inline: 20px; column-gap: 16px; }
+  .hero > .site-header .desktop-nav { font-size: 11px; gap: 2px; }
+  .hero > .site-header .desktop-nav a { padding-inline: 9px; }
+  .hero > .site-header > .language-toggle { min-width: 59px; padding-inline: 9px; }
+}
+@media(max-width:900px) {
+  .hero > .site-header {
+    grid-template-columns: minmax(0,1fr) auto;
+    grid-template-rows: 36px auto;
+    width: calc(100% - 32px);
+    height: auto;
+    min-height: 111px;
+    margin-top: 13px;
+    padding: 12px 18px 11px;
+    row-gap: 7px;
+    column-gap: 20px;
+    border-radius: 18px;
+  }
+  .hero > .site-header > .logo { grid-column: 1; grid-row: 1; width: fit-content; font-size: 30px; }
+  .hero > .site-header > .language-toggle { grid-column: 2; grid-row: 1; min-height: 32px; }
+  .hero > .site-header .desktop-nav {
+    grid-column: 1/-1;
+    grid-row: 2;
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .hero > .site-header .desktop-nav a { min-height: 31px; padding: 6px 10px; font-size: 10px; border-radius: 9px; }
+  .hero .hero-status { top: 143px; }
+  .hero .hero-copy { top: max(197px,30svh); }
+}
+@media(max-width:620px) {
+  .hero > .site-header {
+    width: calc(100% - 28px);
+    min-height: 130px;
+    margin-top: 12px;
+    padding: 12px 13px 12px;
+    row-gap: 8px;
+    border-radius: 17px;
+  }
+  .hero > .site-header .desktop-nav {
+    display: grid !important;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 3px 6px;
+    align-items: stretch;
+  }
+  .hero > .site-header .desktop-nav a { min-height: 29px; padding: 5px 5px; font-size: 10px; line-height: 1.5; }
+  .hero > .site-header > .language-toggle { min-width: 61px; min-height: 31px; font-size: 10px; }
+  .hero .hero-status { top: 158px; }
+  .hero .hero-copy { top: clamp(206px,25svh,224px); }
+}
+@media(max-width:560px) {
+  .contact-scene .portfolio-contact-links > .contact-icon-wrap {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+  }
+  .contact-scene .contact-icon-wrap > .portfolio-contact-icon { flex-basis: 42px; width: 42px; height: 42px; }
+  .contact-scene .contact-icon-wrap > .contact-tooltip {
+    top: calc(100% + 12px);
+    left: 0;
+    min-width: 126px;
+    max-width: min(240px,calc(100vw - 40px));
+    padding: 11px 12px 12px;
+    border-radius: 12px;
+    transform: translateY(7px);
+  }
+  .contact-scene .contact-icon-wrap > .contact-tooltip::before { left: 16px; }
+  .contact-scene .contact-icon-wrap:is(:hover,:focus-within) > .contact-tooltip { transform: translateY(0); }
+  .contact-scene .contact-icon-wrap:nth-child(2) > .contact-tooltip { max-width: min(240px,calc(100vw - 96px)); }
+  .contact-scene .contact-icon-wrap:nth-child(3) > .contact-tooltip { max-width: min(200px,calc(100vw - 147px)); }
+  .contact-scene .contact-tooltip-label { font-size: 7px; }
+  .contact-scene .contact-tooltip-value { font-size: 11px; }
+  .contact-scene .portfolio-contact-links > .contact-feedback { top: calc(100% + 119px); max-width: calc(100vw - 40px); font-size: 10px; }
+  .contact-scene .education-contact-hint { font-size: 8px; }
+}
+@media(max-width:740px) {
+  .editor-topbar #editor-language { min-width: 60px; min-height: 31px; font-size: 10px; padding: 6px 9px; }
+  .editor-topbar:has(> #editor-language) .editor-brand { order: 0; }
+  .editor-topbar > #editor-language { order: 1; margin-left: auto; }
+  .editor-topbar:has(> #editor-language) #save-status { order: 2; flex: 1 0 100%; max-width: none; margin-left: 0; }
+  .editor-topbar:has(> #editor-language) .editor-actions { order: 3; }
+  .editor-topbar .editor-actions > #editor-language { flex: 0 0 auto; }
+}
+@media(max-width:360px) {
+  .hero > .site-header { width: calc(100% - 22px); padding-inline: 11px; }
+  .hero > .site-header .desktop-nav { column-gap: 4px; }
+  .hero > .site-header .desktop-nav a { font-size: 9px; padding-inline: 2px; }
+  .hero > .site-header > .logo { font-size: 28px; }
+}
+@media(max-width:620px) and (max-height:600px) {
+  .hero .hero-status { display: none; }
+  .hero .hero-copy { top: 164px; }
+}
+@media(max-width:620px) and (max-height:520px) {
+  .hero .hero-copy { top: 163px; }
+}
+@media(max-height:620px) and (min-width:621px) {
+  .hero .hero-status { display: none; }
+  .hero .hero-copy { top: max(144px,29svh); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .hero > .site-header .desktop-nav a,
+  .hero > .site-header > .language-toggle,
+  .contact-scene .contact-tooltip { transition: none; }
+}
+
+/* The standalone draft uses a compact utility header rather than the hero bar. */
+.draft-header > .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 57px;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid rgba(194,205,210,.56);
+  border-radius: 10px;
+  background: rgba(255,255,255,.82);
+  color: #40574a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  font: 800 9px/1.5 var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(13px);
+  backdrop-filter: blur(13px);
+}
+.draft-header > .language-toggle:hover { background: rgba(255,255,255,.98); }
+.draft-header > .language-toggle:focus-visible { outline: 2px solid #8ba293; outline-offset: 3px; }
+@media(max-width:560px) {
+  .draft-header > .language-toggle { min-width: 49px; min-height: 29px; padding: 6px 8px; font-size: 8px; }
+}
