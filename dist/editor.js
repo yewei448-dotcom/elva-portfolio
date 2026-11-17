@@ -1,9 +1,9 @@
 (() => {
   'use strict';
   const STORAGE_KEY = 'yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeLocalization.v3';
+  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeCapabilitiesRefresh.v4';
   const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '作品 / 案例分类' };
-  const PAGE_LABELS = { home: '首页', education: '学历', experience: '经历', capability: '作品集', ai: 'AI应用', contact: '联系', building: '作品', life: '生活' };
+  const PAGE_LABELS = { home: '首页', education: '学历', experience: '经历', capability: '能力', ai: 'AI应用', contact: '联系', building: '作品', life: '生活' };
   const MAX_JSON_BYTES = 48 * 1024 * 1024;
   const $ = selector => document.querySelector(selector);
   const els = {
@@ -100,7 +100,7 @@
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
     if (value.structureVersion !== undefined) {
-      if (![1, 2, 3, 4].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
+      if (![1, 2, 3, 4, 5].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
       normalized.structureVersion = value.structureVersion;
     }
     for (const key of ['name', 'tagline', 'phone', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
@@ -152,7 +152,7 @@
           for (const key of ['title', 'text', 'url', 'image', 'meta', 'details', 'role', 'industry', 'period']) ni[key] = requireString(item[key], '条目内容', key === 'image' ? 12 * 1024 * 1024 : key === 'details' ? 40000 : 20000);
           if (!safeUrl(ni.url)) throw new Error('条目链接含不安全的地址，请使用 http、https、mailto 或 tel 链接。');
           if (!safeUrl(ni.image, true)) throw new Error('条目图片包含不支持的地址。');
-          if (item.links !== undefined && (!Array.isArray(item.links) || item.links.length > 30)) throw new Error('每个条目最多支持 30 个关联链接。');
+          if (item.links !== undefined && (!Array.isArray(item.links) || item.links.length > 64)) throw new Error('每个条目最多支持 64 个关联链接。');
           ni.links = (item.links || []).map(link => {
             if (!link || typeof link !== 'object' || Array.isArray(link)) throw new Error('关联链接格式不正确。');
             const label = requireString(link.label, '链接文字', 1000);
@@ -216,7 +216,7 @@
   }
   function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(pushPreview, 120); }
   function backupLegacyDraft(raw, value) {
-    if (!raw || value?.structureVersion === 4) return;
+    if (!raw || value?.structureVersion === 5) return;
     legacyBackupRaw = raw;
     try {
       if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, raw);
@@ -592,7 +592,7 @@
     redraw();
     linkGroup.body.append(list, button('＋ 添加关联链接', 'button-quiet add-proof-link', () => {
       item.links ||= [];
-      if (item.links.length >= 30) { showToast('每个条目最多支持 30 个关联链接。'); return; }
+      if (item.links.length >= 64) { showToast('每个条目最多支持 64 个关联链接。'); return; }
       item.links.push({ label: '', url: '' }); changed(); redraw();
     }));
     body.append(linkGroup.details);

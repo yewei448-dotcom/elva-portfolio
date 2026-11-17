@@ -6,7 +6,7 @@
   const object = value => value && typeof value === 'object' && !Array.isArray(value);
   const dictionaries = {
     zh: {
-      'nav.home': '首页', 'nav.experience': '经历', 'nav.capability': '作品集',
+      'nav.home': '首页', 'nav.experience': '经历', 'nav.capability': '能力',
       'nav.ai': 'AI 应用', 'nav.life': '生活', 'nav.education': '学历', 'nav.contact': '联系方式',
       'ui.edit': '编辑', 'ui.backToTop': '回到顶部', 'ui.openLink': '查看作品',
       'ui.copyWechat': '复制微信号', 'ui.copied': '微信号已复制', 'ui.email': '邮件',
@@ -15,7 +15,7 @@
       'editor.seedHint': 'English 初稿已提供英文导航和标题，作品描述沿用中文，方便你自行翻译。两种语言独立保存。'
     },
     en: {
-      'nav.home': 'Home', 'nav.experience': 'Experience', 'nav.capability': 'Portfolio',
+      'nav.home': 'Home', 'nav.experience': 'Experience', 'nav.capability': 'Capabilities',
       'nav.ai': 'AI Apps', 'nav.life': 'Life', 'nav.education': 'Education', 'nav.contact': 'Contact',
       'ui.edit': 'Edit', 'ui.backToTop': 'Back to top', 'ui.openLink': 'View work',
       'ui.copyWechat': 'Copy WeChat ID', 'ui.copied': 'WeChat ID copied', 'ui.email': 'Email',
@@ -53,7 +53,7 @@
   function createEnglish(document) {
     const draft = standalone(document, 'zh');
     const exact = {
-      '工作经历': 'Experience', '作品集': 'Portfolio', 'AI 应用': 'AI Applications',
+      '工作经历': 'Experience', '作品集': 'Capabilities', '能力': 'Capabilities', 'AI 应用': 'AI Applications',
       '生活里的片段': 'Life', '教育经历': 'Education',
       '一起做点\n值得被记住的事。': 'Let’s make something\nworth remembering.',
       '达人 · SEO · AI': 'Influencers · SEO · AI',

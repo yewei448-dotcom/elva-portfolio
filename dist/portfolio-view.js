@@ -198,7 +198,7 @@
     if (item.text) copy.append(el('span', 'piece-description', item.text));
     const highlight = item.metrics?.find(metric => metric.value);
     if (highlight) copy.append(el('span', 'piece-highlight', `${highlight.value} · ${highlight.label || '项目成果'}`));
-    const action = el('span', 'piece-action', textFor('查看作品 +', 'View work +')); copy.append(action);
+    const action = el('span', 'piece-action', textFor('查看案例 +', 'View case +')); copy.append(action);
     summary.append(cover, copy);
     const body = el('div', 'piece-body');
     if (item.details) body.append(paragraphs(item.details));
@@ -208,16 +208,32 @@
     }
     const proofs = uniqueLinks(item);
     const links = el('div', 'proof-links');
-    proofs.forEach(proof => links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')));
+    const groupedLinks = new Map();
+    const groupTitles = {
+      '云台原创': textFor('云台 · 原创模板', 'Gimbal · Original templates'),
+      '百万播放': textFor('云台 · 百万播放案例', 'Gimbal · Million-view videos'),
+      'Mic': textFor('Mic · 达人合作', 'Mic · Creator collaboration')
+    };
+    proofs.forEach(proof => {
+      const separator = proof.label.indexOf('｜');
+      const group = separator >= 0 ? proof.label.slice(0, separator) : '';
+      if (!Object.hasOwn(groupTitles, group)) { links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')); return; }
+      if (!groupedLinks.has(group)) {
+        const fold = el('details', 'case-proof-group');
+        const summary = el('summary'); summary.append(el('span', '', groupTitles[group]), el('span', 'fold-plus', '+'));
+        const list = el('div', 'proof-links'); fold.append(summary, list); links.append(fold); groupedLinks.set(group, list);
+      }
+      groupedLinks.get(group).append(link(proof.url, `${proof.label.slice(separator + 1)} ↗`, 'proof-link'));
+    });
     if (!proofs.length) links.append(link(`editor.html?page=capability&section=${encodeURIComponent(sectionId)}`, textFor('补充作品链接 ↗', 'Add work links ↗'), 'proof-link'));
     body.append(links); card.append(summary, body);
-    card.addEventListener('toggle', () => { action.textContent = card.open ? textFor('收起作品 −', 'Close work −') : textFor('查看作品 +', 'View work +'); });
+    card.addEventListener('toggle', () => { action.textContent = card.open ? textFor('收起案例 −', 'Close case −') : textFor('查看案例 +', 'View case +'); });
     return card;
   }
   function portfolioSection(section, index = 0) {
     const block = el('section', 'work-category'); block.dataset.sectionId = section.id; block.id = section.id;
     const heading = el('header', 'work-category-heading');
-    heading.append(el('span', 'portfolio-kicker', String(index + 1).padStart(2, '0')), el('h3', '', section.title || '作品'));
+    heading.append(el('span', 'portfolio-kicker', String(index + 1).padStart(2, '0')), el('h3', '', section.title || textFor('能力', 'Capabilities')));
     if (section.subtitle) heading.append(el('p', '', section.subtitle));
     const cards = el('div', 'work-cards');
     (section.items || []).forEach((item, i) => cards.append(portfolioPiece(item, i, section.id)));

@@ -1,7 +1,7 @@
-// 双语网站根稿；localizations.en 为独立完整英文稿，学历只默认展示硕士。
+// 能力案例与双语稿；历史默认字段精确更新，自定义内容与旧链接保留。
 window.websiteDefaults = {
   "schemaVersion": 1,
-  "structureVersion": 4,
+  "structureVersion": 5,
   "site": {
     "name": "叶薇",
     "tagline": "达人 · SEO · AI",
@@ -187,8 +187,8 @@ window.websiteDefaults = {
     },
     {
       "id": "capability",
-      "name": "作品集",
-      "title": "作品集",
+      "name": "能力",
+      "title": "能力",
       "subtitle": "案例、内容与合作。",
       "background": {
         "color": "#fbfaf5",
@@ -204,17 +204,13 @@ window.websiteDefaults = {
           "items": [
             {
               "id": "douyin-insta360",
-              "title": "抖音｜Insta360",
-              "text": "擅长爆款策划，从 0 到 1 验证并复用内容模板。",
+              "title": "影石｜抖音 KOC 营销",
+              "text": "挖掘潜力 KOC，以低成本合作获得高曝光；原创模板兼顾产品卖点与观赏性。",
               "url": "",
-              "image": "",
+              "image": "assets/platforms/douyin-cover.svg",
               "meta": "国内 · 创作者合作",
-              "details": "球类模板：123 条内容，累计 2,000 万曝光。\n情侣盗梦空间创意首条 200 万+播放，后续复刻累计 500 万+曝光。",
-              "steps": [
-                "卖点拆解",
-                "创意验证",
-                "模板复用"
-              ],
+              "details": "挖掘有潜力的 KOC，通过低成本换取高曝光。\n洞察产品独特卖点，策划区别于竞品的原创模板，打出爆款并影响竞品。\n兼顾审美与卖点展示，让内容清楚传达产品价值，同时具有较强观赏力。",
+              "steps": [],
               "metrics": [
                 {
                   "value": "250+",
@@ -223,31 +219,47 @@ window.websiteDefaults = {
                 {
                   "value": "400+",
                   "label": "合作视频"
-                },
-                {
-                  "value": "4,200 万",
-                  "label": "累计曝光"
                 }
               ],
               "links": [
                 {
-                  "label": "查看爆款内容",
-                  "url": ""
+                  "label": "云台原创｜羽毛球",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAAWTK8Jqr4Gwdm-t-sV-US75IELd7fYh6nQTVu5Uvhl_Q?from_tab_name=main&modal_id=7591785356573198026"
                 },
                 {
-                  "label": "查看 0→1 内容模板",
-                  "url": ""
+                  "label": "云台原创｜盗梦空间",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAARARklu4q23R8NO2GWEGw1LAns4E6n04ahQb4BT-oVx0?from_tab_name=main&modal_id=7580231868417018858"
+                },
+                {
+                  "label": "云台原创｜足球 / 排球 / 乒乓球",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAARUnLjmSpayz-xhfooZIuHB0lj6j5JywyRTEE5Ffq6I3QQKyLGhx1QCWmjlMfCoCn?from_tab_name=main&modal_id=7598505599899101362&showSubTab=video&showTab=post"
+                },
+                {
+                  "label": "云台原创｜定点运镜",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAArHQUe0id2qYSZEXXeU3cvNkbhe9gWlWnKVCQmHD9So4?from_tab_name=main&modal_id=7619635911970384383"
+                },
+                {
+                  "label": "百万播放｜小飞侠篮球",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAARUnLjmSpayz-xhfooZIuHB0lj6j5JywyRTEE5Ffq6I3QQKyLGhx1QCWmjlMfCoCn/search/%E5%B0%8F%E9%A3%9E%E4%BE%A0%E7%AF%AE%E7%90%83?aid=660e1515-3d5d-4c75-9e26-590cb6bd0b17&modal_id=7582431167871569201&type=general"
+                },
+                {
+                  "label": "百万播放｜内容案例",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAA-eybUK0wywAwRz0DYoOQvGZcDBju7SpN8sf-SCWhK1w?from_tab_name=main&modal_id=7619260857202190713"
+                },
+                {
+                  "label": "Mic｜内容案例",
+                  "url": "https://www.douyin.com/user/MS4wLjABAAAAx5ofEt5ZIoAxAUK32B1sSsYnKNDwl61JDq-3NLA6ycA?from_tab_name=main&modal_id=7619524653174711283"
                 }
               ]
             },
             {
               "id": "youtube-softbull",
               "title": "YouTube｜软牛",
-              "text": "海外达人开发、合作跟进与转化复盘。",
+              "text": "跟踪 Google / YouTube SERP，发掘排名突出的达人；核心关键词内容获 AIO 引用。",
               "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
-              "image": "",
+              "image": "assets/platforms/youtube-cover.svg",
               "meta": "海外 · 达人合作",
-              "details": "负责频道筛选、英语建联、议价与合作跟进，用转化数据复盘合作效果。",
+              "details": "及时关注 Google SERP 与 YouTube SERP，寻找排名能力突出的红人。\n核心关键词内容获得 AIO 引用；推进频道筛选、英语建联、合作跟进与效果复盘。",
               "steps": [
                 "筛选频道",
                 "英语建联",
@@ -290,13 +302,18 @@ window.websiteDefaults = {
             {
               "id": "tiktok",
               "title": "@jesus.holds.you",
-              "text": "我的 TikTok 内容账号。",
+              "text": "从 0 到 1 孵化账号，粉丝从 13 增长至 1 万+。",
               "url": "https://www.tiktok.com/@jesus.holds.you",
-              "image": "",
-              "meta": "TikTok",
+              "image": "assets/platforms/tiktok-cover.svg",
+              "meta": "TikTok · 0→1 孵化",
               "details": "",
               "steps": [],
-              "metrics": [],
+              "metrics": [
+                {
+                  "value": "13 → 1万+",
+                  "label": "账号粉丝"
+                }
+              ],
               "links": [
                 {
                   "label": "访问 TikTok",
@@ -309,7 +326,7 @@ window.websiteDefaults = {
               "title": "@oppo.austria",
               "text": "奥地利市场品牌社媒账号。",
               "url": "https://www.tiktok.com/@oppo.austria",
-              "image": "",
+              "image": "assets/platforms/tiktok-cover.svg",
               "meta": "TikTok · 奥地利",
               "details": "内容本地化、账号运营与达人合作。",
               "steps": [],
@@ -323,10 +340,10 @@ window.websiteDefaults = {
             },
             {
               "id": "rednote",
-              "title": "小红书 · 爆款内容",
-              "text": "自己做过的一篇内容。",
+              "title": "小红书｜毕业鲜花选购",
+              "text": "毕业鲜花选购内容。",
               "url": "https://www.xiaohongshu.com/explore/64644c650000000027010035?xsec_token=ABslPFD3OynjggrGcqOr6iNJeoteEAtef9axBw0V4eSJw=&xsec_source=pc_user",
-              "image": "",
+              "image": "assets/platforms/xiaohongshu-flowers.png",
               "meta": "内容案例",
               "details": "",
               "steps": [],
@@ -351,7 +368,7 @@ window.websiteDefaults = {
               "title": "YouTube 内容与搜索",
               "text": "Google AI Overview 引用。",
               "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
-              "image": "",
+              "image": "assets/platforms/youtube-cover.svg",
               "meta": "项目期表现",
               "details": "",
               "steps": [],
@@ -368,7 +385,7 @@ window.websiteDefaults = {
               "title": "站外文章与搜索",
               "text": "SERP 首页第 1 位。",
               "url": "https://www.concept-phones.com/apple/iphone-18-pro-stuck-on-preparing-to-transfer/",
-              "image": "",
+              "image": "assets/platforms/google-cover.svg",
               "meta": "项目期表现",
               "details": "",
               "steps": [],
@@ -1022,7 +1039,7 @@ function migrateWebsiteDraftV3(value) {
 
 
 // v4 调整页面顺序与默认学历，不覆盖自定义内容或英文稿。
-window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{language='zh'}={}) {
+function migrateWebsiteDraftV4(value,{language='zh'}={}) {
   if(!value||value.schemaVersion!==1||!Array.isArray(value.pages))return value;
   if(Number(value.structureVersion)>=4)return value;
   const clone=object=>JSON.parse(JSON.stringify(object));
@@ -1053,5 +1070,248 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{lan
       if(item.text==='211 高校')item.text='';
     });
   });
+  return next;
+};
+
+
+// v5 更新能力案例和封面，不覆盖中文或英文的自写字段。
+window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{language='zh'}={}) {
+  if(!value||value.schemaVersion!==1||!Array.isArray(value.pages))return value;
+  if(Number(value.structureVersion)>=5)return value;
+  const clone=object=>JSON.parse(JSON.stringify(object));
+  const own=(object,key)=>Object.prototype.hasOwnProperty.call(object,key);
+  const baseline={
+  "id": "capability",
+  "name": "作品集",
+  "title": "作品集",
+  "subtitle": "案例、内容与合作。",
+  "background": {
+    "color": "#fbfaf5",
+    "image": "",
+    "overlay": 0.12
+  },
+  "sections": [
+    {
+      "id": "influencer",
+      "kind": "capability",
+      "title": "达人营销",
+      "subtitle": "",
+      "items": [
+        {
+          "id": "douyin-insta360",
+          "title": "抖音｜Insta360",
+          "text": "擅长爆款策划，从 0 到 1 验证并复用内容模板。",
+          "url": "",
+          "image": "",
+          "meta": "国内 · 创作者合作",
+          "details": "球类模板：123 条内容，累计 2,000 万曝光。\n情侣盗梦空间创意首条 200 万+播放，后续复刻累计 500 万+曝光。",
+          "steps": [
+            "卖点拆解",
+            "创意验证",
+            "模板复用"
+          ],
+          "metrics": [
+            {
+              "value": "250+",
+              "label": "合作 KOC"
+            },
+            {
+              "value": "400+",
+              "label": "合作视频"
+            },
+            {
+              "value": "4,200 万",
+              "label": "累计曝光"
+            }
+          ],
+          "links": [
+            {
+              "label": "查看爆款内容",
+              "url": ""
+            },
+            {
+              "label": "查看 0→1 内容模板",
+              "url": ""
+            }
+          ]
+        },
+        {
+          "id": "youtube-softbull",
+          "title": "YouTube｜软牛",
+          "text": "海外达人开发、合作跟进与转化复盘。",
+          "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
+          "image": "",
+          "meta": "海外 · 达人合作",
+          "details": "负责频道筛选、英语建联、议价与合作跟进，用转化数据复盘合作效果。",
+          "steps": [
+            "筛选频道",
+            "英语建联",
+            "合作跟进",
+            "效果复盘"
+          ],
+          "metrics": [
+            {
+              "value": "100 位",
+              "label": "合作达人"
+            },
+            {
+              "value": "50 条",
+              "label": "独立视频"
+            },
+            {
+              "value": "6,000",
+              "label": "引流会话"
+            }
+          ],
+          "links": [
+            {
+              "label": "查看代表合作视频",
+              "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s"
+            },
+            {
+              "label": "补充合作案例",
+              "url": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social",
+      "kind": "capability",
+      "title": "社媒运营",
+      "subtitle": "",
+      "items": [
+        {
+          "id": "tiktok",
+          "title": "@jesus.holds.you",
+          "text": "我的 TikTok 内容账号。",
+          "url": "https://www.tiktok.com/@jesus.holds.you",
+          "image": "",
+          "meta": "TikTok",
+          "details": "",
+          "steps": [],
+          "metrics": [],
+          "links": [
+            {
+              "label": "访问 TikTok",
+              "url": "https://www.tiktok.com/@jesus.holds.you"
+            }
+          ]
+        },
+        {
+          "id": "oppo-austria",
+          "title": "@oppo.austria",
+          "text": "奥地利市场品牌社媒账号。",
+          "url": "https://www.tiktok.com/@oppo.austria",
+          "image": "",
+          "meta": "TikTok · 奥地利",
+          "details": "内容本地化、账号运营与达人合作。",
+          "steps": [],
+          "metrics": [],
+          "links": [
+            {
+              "label": "访问 TikTok",
+              "url": "https://www.tiktok.com/@oppo.austria"
+            }
+          ]
+        },
+        {
+          "id": "rednote",
+          "title": "小红书 · 爆款内容",
+          "text": "自己做过的一篇内容。",
+          "url": "https://www.xiaohongshu.com/explore/64644c650000000027010035?xsec_token=ABslPFD3OynjggrGcqOr6iNJeoteEAtef9axBw0V4eSJw=&xsec_source=pc_user",
+          "image": "",
+          "meta": "内容案例",
+          "details": "",
+          "steps": [],
+          "metrics": [],
+          "links": [
+            {
+              "label": "查看小红书内容",
+              "url": "https://www.xiaohongshu.com/explore/64644c650000000027010035?xsec_token=ABslPFD3OynjggrGcqOr6iNJeoteEAtef9axBw0V4eSJw=&xsec_source=pc_user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seo",
+      "kind": "capability",
+      "title": "SEO运营",
+      "subtitle": "",
+      "items": [
+        {
+          "id": "seo-video",
+          "title": "YouTube 内容与搜索",
+          "text": "Google AI Overview 引用。",
+          "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s",
+          "image": "",
+          "meta": "项目期表现",
+          "details": "",
+          "steps": [],
+          "metrics": [],
+          "links": [
+            {
+              "label": "查看代表视频",
+              "url": "https://www.youtube.com/watch?v=90ziMDjsXGY&t=314s"
+            }
+          ]
+        },
+        {
+          "id": "seo-article",
+          "title": "站外文章与搜索",
+          "text": "SERP 首页第 1 位。",
+          "url": "https://www.concept-phones.com/apple/iphone-18-pro-stuck-on-preparing-to-transfer/",
+          "image": "",
+          "meta": "项目期表现",
+          "details": "",
+          "steps": [],
+          "metrics": [],
+          "links": [
+            {
+              "label": "查看文章",
+              "url": "https://www.concept-phones.com/apple/iphone-18-pro-stuck-on-preparing-to-transfer/"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+  const next=clone(migrateWebsiteDraftV4(value,{language}));next.structureVersion=5;
+  const current=next.pages.find(page=>page.id==='capability');
+  const standard=window.websiteDefaults.pages.find(page=>page.id==='capability');
+  const previousName=language==='en'?'Portfolio':baseline.name;
+  const previousTitle=language==='en'?'Portfolio':baseline.title;
+  if(current){
+    if(!own(current,'name')||current.name===previousName)current.name=language==='en'?'Capabilities':standard.name;
+    if(!own(current,'title')||current.title===previousTitle)current.title=language==='en'?'Capabilities':standard.title;
+    for(const section of current.sections||[]){
+      const oldSection=baseline.sections.find(item=>item.id===section.id);
+      const newSection=standard.sections.find(item=>item.id===section.id);
+      if(!oldSection||!newSection)continue;
+      for(const item of section.items||[]){
+        const oldItem=oldSection.items.find(saved=>saved.id===item.id),newItem=newSection.items.find(saved=>saved.id===item.id);
+        if(!oldItem||!newItem)continue;
+        for(const key of ['title','text','image','meta','details','steps','metrics']){
+          if(!own(newItem,key))continue;
+          if(!own(item,key)||JSON.stringify(item[key])===JSON.stringify(oldItem[key]))item[key]=clone(newItem[key]);
+        }
+        const links=[],seen=new Set();
+        const add=link=>{
+          if(!link||typeof link.label!=='string'||typeof link.url!=='string')return;
+          const key=link.url?'url:'+link.url:'slot:'+link.label;
+          if(seen.has(key))return;seen.add(key);links.push(clone(link));
+        };
+        (item.links||[]).forEach(add);
+        if(typeof item.url==='string'&&item.url&&!links.some(link=>link.url===item.url))add({label:'查看作品',url:item.url});
+        (newItem.links||[]).forEach(add);
+        item.links=links;
+      }
+    }
+  }
+  const english=next.localizations?.en;
+  if(english&&typeof english==='object'&&!Array.isArray(english)&&!own(english,'localizations'))next.localizations.en=migrateWebsiteDraftPhotos(english,{language:'en'});
   return next;
 };

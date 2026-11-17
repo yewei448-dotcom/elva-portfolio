@@ -23,7 +23,7 @@
     block.append(renderItems(section)); return block;
   }
   const pages = ['experience', 'capability', 'ai', 'life', 'education', 'contact'];
-  const labels = ['EXPERIENCE', 'PORTFOLIO', 'AI APPLICATIONS', 'LIFE', 'EDUCATION', 'CONTACT'];
+  const labels = ['EXPERIENCE', 'CAPABILITIES', 'AI APPLICATIONS', 'LIFE', 'EDUCATION', 'CONTACT'];
   pages.forEach((id, i) => {
     const page = draft.pages.find(x => x.id === id);
     if (!page) return;
@@ -54,7 +54,7 @@
       shell.append(grid);
     } else if (id === 'capability') {
       const tools = el('div', 'portfolio-tools');
-      const edit = el('a', 'section-edit-link', copy('编辑作品集 ↗', 'Edit portfolio ↗')); edit.href = `editor.html?page=capability&lang=${language}`; tools.append(edit); shell.append(tools);
+      const edit = el('a', 'section-edit-link', copy('编辑能力案例 ↗', 'Edit capability cases ↗')); edit.href = `editor.html?page=capability&lang=${language}`; tools.append(edit); shell.append(tools);
       const list = el('div', 'portfolio-gallery');
       page.sections.forEach((s, index) => list.append(ui.portfolioSection(s, index)));
       shell.append(list);

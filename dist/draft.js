@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const STORAGE_KEY='yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeLocalization.v3';
+  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeCapabilitiesRefresh.v4';
   document.body.dataset.draftContext='true';
   const params=new URLSearchParams(location.search);
   const embedded=params.get('editor')==='1'&&parent!==window;
@@ -15,7 +15,7 @@
     if(!raw)return null;
     let cached;
     try{cached=JSON.parse(raw);}catch{try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}return null;}
-    if(cached?.structureVersion!==4){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
+    if(cached?.structureVersion!==5){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
     return cached?.schemaVersion===1&&Array.isArray(cached.pages)?migratePhotos(cached):null;
   }
   if(!embedded){try{const cached=readCachedDraft(localStorage.getItem(STORAGE_KEY));if(cached){sourceDraft=cached;draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;}}catch{}}
@@ -40,7 +40,7 @@
   function appendProofLinks(container,item){
     if(!Array.isArray(item.links))return;
     const list=el('div','item-actions proof-links');
-    item.links.slice(0,30).forEach(link=>{if(!link||typeof link!=='object')return;const url=safeUrl(link.url);const label=typeof link.label==='string'?link.label:'相关作品';if(url)list.append(externalLink(url,(label||'打开链接')+' ↗','item-link'));else if(label)list.append(el('span','pending-link',label+' · 待填写'));});
+    item.links.slice(0,64).forEach(link=>{if(!link||typeof link!=='object')return;const url=safeUrl(link.url);const label=typeof link.label==='string'?link.label:'相关作品';if(url)list.append(externalLink(url,(label||'打开链接')+' ↗','item-link'));else if(label)list.append(el('span','pending-link',label+' · 待填写'));});
     if(list.childNodes.length)container.append(list);
   }
   function showDetail(item,isPhoto=false){
