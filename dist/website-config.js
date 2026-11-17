@@ -519,31 +519,6 @@ window.websiteDefaults = {
               ]
             }
           ]
-        },
-        {
-          "id": "ai-resources",
-          "kind": "links",
-          "title": "",
-          "subtitle": "",
-          "items": [
-            {
-              "id": "github",
-              "title": "GitHub",
-              "text": "代码与实验",
-              "url": "https://github.com/repos",
-              "image": "",
-              "meta": "",
-              "details": "",
-              "steps": [],
-              "metrics": [],
-              "links": [
-                {
-                  "label": "GitHub",
-                  "url": "https://github.com/repos"
-                }
-              ]
-            }
-          ]
         }
       ]
     },
@@ -1381,14 +1356,27 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{lan
     const oldSubtitles=['BD / 内容生产 / CMS','把重复工作整理成可以复用的流程。'];
     if(language==='en')oldSubtitles.push('Outreach / Content / CMS');
     if(!own(ai,'subtitle')||oldSubtitles.includes(ai.subtitle))ai.subtitle=language==='en'?'Embrace AI, embrace the world.\nAI opens a new world of work for me.':aiDefault.subtitle;
-    const sectionDefault=clone(aiDefault.sections.find(section=>section.id==='ai-resources'));
-    if(language==='en')sectionDefault.items[0].text='Code & experiments';
-    ai.sections=Array.isArray(ai.sections)?ai.sections:[];
-    const section=ai.sections.find(section=>section.id==='ai-resources');
-    if(!section)ai.sections.push(sectionDefault);
-    else if(Array.isArray(section.items)&&!section.items.some(item=>item.id==='github'))section.items.push(sectionDefault.items[0]);
   }
   const english=next.localizations?.en;
   if(english&&typeof english==='object'&&!Array.isArray(english)&&!own(english,'localizations'))next.localizations.en=migrateWebsiteDraftPhotos(english,{language:'en'});
+  return next;
+};
+
+// Retire the GitHub card from saved Chinese and English drafts as well.
+const migrateWebsiteDraftWithoutRetiredResources = window.migrateWebsiteDraftPhotos;
+window.migrateWebsiteDraftPhotos = function(value, options) {
+  const result = migrateWebsiteDraftWithoutRetiredResources(value, options);
+  function clean(draft) {
+    if (!draft || !Array.isArray(draft.pages)) return draft;
+    return {...draft, pages: draft.pages.map(page => page.id !== 'ai' ? page : {...page,
+      sections: (page.sections || []).flatMap(section => {
+        if (section.id !== 'ai-resources') return [section];
+        const items = (section.items || []).filter(item => item.id !== 'github');
+        return items.length ? [{...section, items}] : [];
+      })
+    })};
+  }
+  const next = clean(result);
+  if (next?.localizations?.en) next.localizations = {...next.localizations, en: clean(next.localizations.en)};
   return next;
 };
