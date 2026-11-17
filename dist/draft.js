@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const STORAGE_KEY='yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforeCapabilitiesRefresh.v4';
+  const BACKUP_STORAGE_KEY='yewei.visualDraft.beforePresentationRefresh.v5';
   document.body.dataset.draftContext='true';
   const params=new URLSearchParams(location.search);
   const embedded=params.get('editor')==='1'&&parent!==window;
@@ -15,7 +15,7 @@
     if(!raw)return null;
     let cached;
     try{cached=JSON.parse(raw);}catch{try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}return null;}
-    if(cached?.structureVersion!==5){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
+    if(cached?.structureVersion!==6){try{if(localStorage.getItem(BACKUP_STORAGE_KEY)===null)localStorage.setItem(BACKUP_STORAGE_KEY,raw);}catch{}}
     return cached?.schemaVersion===1&&Array.isArray(cached.pages)?migratePhotos(cached):null;
   }
   if(!embedded){try{const cached=readCachedDraft(localStorage.getItem(STORAGE_KEY));if(cached){sourceDraft=cached;draft=window.WebsiteLanguage?.resolve(sourceDraft,language)||sourceDraft;}}catch{}}
@@ -35,7 +35,7 @@
     return '';
   }
   function send(message){if(embedded)parent.postMessage(message,location.origin);}
-  function goToPage(id){if(!draft.pages.some(p=>p.id===id))return;pageId=id;history.replaceState(null,'',`${location.pathname}${location.search}#${id}`);render();scrollTo({top:0,behavior:'instant'});send({type:'yewei-draft:page',pageId:id});}
+  function goToPage(id){if(!draft.pages.some(p=>p.id===id&&!p.archived))return;pageId=id;history.replaceState(null,'',`${location.pathname}${location.search}#${id}`);render();scrollTo({top:0,behavior:'instant'});send({type:'yewei-draft:page',pageId:id});}
   function externalLink(url,text,cls){const node=el('a',cls,text);node.href=url;node.target='_blank';node.rel='noopener noreferrer';return node;}
   function appendProofLinks(container,item){
     if(!Array.isArray(item.links))return;
@@ -91,11 +91,14 @@
     if(actions.childNodes.length)copy.append(actions);appendProofLinks(copy,item);card.append(copy);return card;
   }
   function render(){
-    if(!draft.pages.some(p=>p.id===pageId))pageId=draft.pages[0]?.id||'home';
+    const visiblePages=draft.pages.filter(p=>!p.archived);
+    if(!visiblePages.some(p=>p.id===pageId))pageId=visiblePages[0]?.id||'home';
     const page=draft.pages.find(p=>p.id===pageId);if(!page)return;
     document.body.dataset.page=page.id;
     window.WebsiteLanguage?.setLanguage(language,{persist:false});document.documentElement.lang=language==='en'?'en':'zh-CN';
     const previousPage=app.dataset.page;const previousScroll=scrollY;
+    const keepCapabilitiesOpen=previousPage===page.id&&Boolean(app.querySelector('.capabilities-reveal[open]'));
+    const openDetails=previousPage===page.id?new Set([...app.querySelectorAll('details[data-detail-key][open]')].map(node=>node.dataset.detailKey)):new Set();
     if(previousPage&&previousPage!==page.id&&dialog.open)dialog.close();
     app.dataset.page=page.id;app.replaceChildren();
     const bg=page.background||{};document.body.style.backgroundColor=/^#[0-9a-f]{3,8}$/i.test(bg.color||'')?bg.color:'#faf8ef';
@@ -104,7 +107,7 @@
     document.body.style.backgroundImage=bgImage?`linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${lowerOverlay})),url(${JSON.stringify(bgImage)})`:'';
     document.title=`${draft.site?.name||'我的网站'} · ${page.name||'预览'}`;
     const header=el('header','draft-header');const logo=el('a','draft-logo','Elva✳');logo.href='#home';logo.setAttribute('aria-label','首页');logo.addEventListener('click',e=>{e.preventDefault();goToPage('home');});
-    const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');draft.pages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
+    const nav=el('nav','page-nav');nav.setAttribute('aria-label','页面导航');visiblePages.slice(0,12).forEach(p=>{const button=el('button',p.id===page.id?'active':'',p.name||p.id);button.type='button';if(p.id===page.id)button.setAttribute('aria-current','page');button.addEventListener('click',()=>goToPage(p.id));nav.append(button);});
     const languageButton=el('button','language-toggle',language==='en'?'中':'EN');languageButton.type='button';languageButton.setAttribute('aria-label',textFor('切换为英文','Switch to Chinese'));
     languageButton.addEventListener('click',()=>{
       const next=language==='en'?'zh':'en';
@@ -115,23 +118,23 @@
     const main=el('main','draft-main');
     if(page.id==='contact'&&typeof window.PortfolioUI?.contactScene==='function'){
       main.classList.add('contact-preview-main');
-      const educationName=draft.pages.find(p=>p.id==='education')?.sections?.flatMap(s=>s.items||[])[0]?.title;
-      main.append(window.PortfolioUI.contactScene(page,draft.site,{educationName,onHome:()=>goToPage('home'),onEducation:()=>goToPage('education'),onEdit:embedded?()=>send({type:'yewei-draft:select',sectionId:page.sections[0]?.id,pageId:page.id}):null}));app.append(main);
+      main.append(window.PortfolioUI.contactScene(page,draft.site,{onHome:()=>goToPage('home'),onEdit:embedded?()=>send({type:'yewei-draft:select',sectionId:page.sections[0]?.id,pageId:page.id}):null}));app.append(main);
       if(!embedded){const edit=el('a','standalone-edit',textFor('返回可视化编辑器 ↗','Back to editor ↗'));edit.href=`editor.html?page=contact&lang=${language}`;app.append(edit);}
       return;
     }
     const hero=el('div','page-intro');
     const portraitImage=page.id==='home'?safeUrl(page.portraitImage,true):'';
     const intro=portraitImage?el('div','home-intro-copy'):hero;
-    if(page.id==='home'&&safeUrl(page.avatarImage,true)){
-      const status=el('div','draft-home-avatar');status.append(imageNode(safeUrl(page.avatarImage,true),'Elva AI avatar'),el('span','',textFor('个人空间','Personal space')));intro.append(status);
-    }
-    const introTitle=el('h1','',page.title||page.name);
     if(page.id==='home'){
-      const [name,...motto]=(page.title||page.name).split('\n');introTitle.replaceChildren(el('span','hero-name',name));if(motto.length)introTitle.append(el('span','hero-motto',motto.join('\n')));
+      const status=el('div','draft-home-avatar');const avatar=safeUrl(page.avatarImage,true);if(avatar)status.append(imageNode(avatar,'Elva AI avatar'));status.append(el('span','',page.statusText??textFor('探索世界中','Exploring the world')));intro.append(status);
     }
-    const chapterNumber=page.id==='home'?0:draft.pages.filter(p=>p.id!=='home').indexOf(page)+1;
-    intro.append(el('span','page-eyebrow',`${String(chapterNumber).padStart(2,'0')} / ${page.name||page.id}`),introTitle,el('p','page-subtitle',page.subtitle||''));
+    const introTitle=el('h1','',page.title??page.name);
+    if(page.id==='home'){
+      const [name,...motto]=(page.title??page.name).split('\n');introTitle.replaceChildren(el('span','hero-name',name));if(motto.length)introTitle.append(el('span','hero-motto',motto.join('\n')));
+    }
+    const chapterNumber=page.id==='home'?0:visiblePages.filter(p=>p.id!=='home').indexOf(page)+1;
+    intro.append(el('span','page-eyebrow',`${String(chapterNumber).padStart(2,'0')} / ${page.name||page.id}`),introTitle);
+    if(page.id==='ai')intro.append(window.PortfolioUI.aiStatement(page.subtitle));else intro.append(el('p','page-subtitle',page.subtitle||''));
     if(portraitImage){
       hero.classList.add('home-intro');hero.append(intro);
       const hanging=el('figure','home-hanging-photo');
@@ -140,11 +143,14 @@
       const card=el('div','home-hanging-card');
       const hole=el('span','home-photo-hole');hole.setAttribute('aria-hidden','true');
       const image=el('img');image.src=portraitImage;image.alt=`${draft.site?.name||'我'}的个人照片`;image.decoding='async';
-      const caption=el('div','home-photo-caption');caption.append(el('strong','',draft.site?.name||'我'),el('span','','PERSONAL SPACE'),el('i','','✿'));
-      card.append(hole,image,caption);hanging.append(rope,clip,card);hero.append(hanging);
+      const caption=el('div','home-photo-caption');caption.append(el('strong','',draft.site?.name||'我'),el('span','','ELVA'));
+      const bottom=el('div','home-photo-bottom');bottom.append(el('span','',page.portraitFooterLeft??textFor('西南财经大学硕士','SWUFE · Master’s')),el('span','',page.portraitFooterRight??'ENTP'));
+      card.append(hole,image,caption,bottom);hanging.append(rope,clip,card);hero.append(hanging);
     }
     main.append(hero);
+    const capabilityGallery=page.id==='capability'?el('div','portfolio-gallery'):null;
     (page.sections||[]).slice(0,100).forEach((section,index)=>{
+      const sharedResource=page.id==='ai'&&section.kind==='links'&&typeof window.PortfolioUI?.resourceLinks==='function';
       const sharedPortfolio=page.id==='capability'&&typeof window.PortfolioUI?.portfolioSection==='function';
       const sharedEducation=page.id==='education'&&typeof window.PortfolioUI?.educationSection==='function';
       const sharedLife=page.id==='life'&&typeof window.PortfolioUI?.lifeSection==='function';
@@ -163,16 +169,20 @@
         });
       }
       if(!sharedCapability&&!sharedPortfolio){
-        const heading=el('div','block-heading');heading.append(el('span','block-number',String(index+1).padStart(2,'0')),el('h2','',section.title||'新板块'));block.append(heading);if(section.subtitle)block.append(el('p','block-subtitle',section.subtitle));
-        if(sharedEducation)block.append(window.PortfolioUI.educationSection(section));
+        if(!sharedResource){const heading=el('div','block-heading');heading.append(el('span','block-number',String(index+1).padStart(2,'0')),el('h2','',section.title||'新板块'));block.append(heading);if(section.subtitle)block.append(el('p','block-subtitle',section.subtitle));}
+        if(sharedResource)block.append(window.PortfolioUI.resourceLinks(section));
+        else if(sharedEducation)block.append(window.PortfolioUI.educationSection(section));
         else if(sharedLife)block.append(window.PortfolioUI.lifeSection(section));
         else if(page.id==='contact'&&section.kind==='links'&&typeof window.PortfolioUI?.contacts==='function')block.append(window.PortfolioUI.contacts(section,draft.site));
         else{
           const items=el('div',`block-items ${section.kind||'text'}-items`);(section.items||[]).slice(0,500).forEach((item,i)=>items.append(renderItem(item,section.kind,i)));if(!items.childNodes.length)items.append(el('p','empty-block','这里还没有内容，可以在编辑面板添加。'));block.append(items);
         }
       }
-      main.append(block);
-    });app.append(main);
+      (capabilityGallery||main).append(block);
+    });
+    if(capabilityGallery){const fold=window.PortfolioUI.capabilityReveal(capabilityGallery);fold.open=keepCapabilitiesOpen;main.append(fold);}
+    app.append(main);
+    app.querySelectorAll('details[data-detail-key]').forEach(node=>{if(openDetails.has(node.dataset.detailKey))node.open=true;});
     const footer=el('footer','draft-footer');const info=el('div');info.append(el('strong','',draft.site?.name||'我的网站'),el('p','',draft.site?.tagline||''));const contact=el('div','footer-contact');
     const email=String(draft.site?.email||'').replace(/[\r\n]/g,'');if(email){const a=el('a','',email+' ↗');a.href='mailto:'+encodeURIComponent(email);contact.append(a);}if(draft.site?.wechat)contact.append(el('span','',textFor('微信 / ','WeChat / ')+draft.site.wechat));footer.append(info,contact);if(bg.image==='assets/meadow.jpg')footer.append(el('small','background-credit','装饰背景：Adrien Olichon / Unsplash'));app.append(footer);
     if(!embedded){const edit=el('a','standalone-edit',textFor('返回可视化编辑器 ↗','Back to editor ↗'));edit.href=`editor.html?lang=${language}`;app.append(edit);}

@@ -86,6 +86,7 @@
   }
   function companyCard(item, index) {
     const card = el('details', `xp-company xp-${index % 5}`);
+    card.dataset.detailKey = JSON.stringify(['company', item.id || index]);
     const summary = el('summary', 'xp-summary');
     const top = el('span', 'xp-top');
     top.append(el('span', '', item.period || item.meta || ''), el('span', 'fold-plus', '+'));
@@ -166,6 +167,7 @@
   }
   function workflow(item, index) {
     const card = el('details', 'ai-workbench');
+    card.dataset.detailKey = JSON.stringify(['workflow', item.id || index]);
     const summary = el('summary');
     const top = el('span', 'workbench-top');
     top.append(el('span', '', `WORKBENCH / ${String(index + 1).padStart(2, '0')}`), el('span', 'fold-plus', '+'));
@@ -183,6 +185,7 @@
   }
   function portfolioPiece(item, index, sectionId) {
     const card = el('details', 'portfolio-piece');
+    card.dataset.detailKey = JSON.stringify(['case', sectionId, item.id || index]);
     const summary = el('summary', 'piece-summary');
     const cover = el('span', 'piece-cover');
     const src = safeUrl(item.image, true);
@@ -220,6 +223,7 @@
       if (!Object.hasOwn(groupTitles, group)) { links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')); return; }
       if (!groupedLinks.has(group)) {
         const fold = el('details', 'case-proof-group');
+        fold.dataset.detailKey = JSON.stringify(['proof', sectionId, item.id || index, group]);
         const summary = el('summary'); summary.append(el('span', '', groupTitles[group]), el('span', 'fold-plus', '+'));
         const list = el('div', 'proof-links'); fold.append(summary, list); links.append(fold); groupedLinks.set(group, list);
       }
@@ -239,6 +243,37 @@
     (section.items || []).forEach((item, i) => cards.append(portfolioPiece(item, i, section.id)));
     if (!(section.items || []).length) cards.append(link(`editor.html?page=capability&section=${encodeURIComponent(section.id)}`, textFor('添加第一件作品 ↗', 'Add your first work ↗'), 'section-edit-link'));
     block.append(heading, cards); return block;
+  }
+  function capabilityReveal(content) {
+    const fold = el('details', 'capabilities-reveal');
+    const trigger = el('summary', 'capabilities-trigger');
+    trigger.append(el('span', '', textFor('看看我擅长什么', 'See what I do best')), el('span', 'reveal-indicator', '+'));
+    const body = el('div', 'capabilities-content'); body.append(content);
+    fold.append(trigger, body); return fold;
+  }
+  function aiStatement(value) {
+    const statement = el('div', 'ai-statement');
+    const lines = String(value || '').split('\n').filter(Boolean);
+    if (lines.length) statement.append(el('strong', '', lines.shift()));
+    if (lines.length) statement.append(el('p', '', lines.join('\n')));
+    return statement;
+  }
+  function resourceLinks(section) {
+    const group = el('div', 'ai-resource-links');
+    (section.items || []).forEach(item => {
+      const url = safeUrl(item.url) || uniqueLinks(item)[0]?.url;
+      if (!url) return;
+      const card = link(url, '', 'ai-resource-card');
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('aria-hidden', 'true');
+      icon.setAttribute('fill', 'none'); icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '1.7');
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16'); icon.append(path);
+      const copy = el('span', 'resource-copy');
+      copy.append(el('span', 'resource-name', item.title || 'GitHub'));
+      if (item.text || item.meta) copy.append(el('span', 'resource-caption', item.text || item.meta));
+      card.append(icon, copy, el('span', 'resource-arrow', '↗')); group.append(card);
+    }); return group;
   }
   function educationSection(section) {
     const group = el('div', 'education-list');
@@ -327,10 +362,8 @@
     const footer = el('footer', 'contact-signature');
     const edit = link('editor.html?page=contact', textFor('编辑 ↗', 'Edit ↗'), 'contact-edit');
     if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
-    const education = link('#education', `${textFor('硕士', 'Master’s')} · ${options.educationName || '西南财经大学'} ↗`, 'education-contact-hint');
-    if (options.onEducation) education.addEventListener('click', event => { event.preventDefault(); options.onEducation(); });
-    footer.append(el('span', '', `${site.name || 'Elva'} / ${textFor('个人网站', 'Personal website')}`), education, edit, el('span', '', `© ${new Date().getFullYear()}`));
+    footer.append(el('span', '', `${site.name || 'Elva'} / ${textFor('个人网站', 'Personal website')}`), edit, el('span', '', `© ${new Date().getFullYear()}`));
     scene.append(bar, message, footer); return scene;
   }
-  window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, educationSection, lifeSection, contacts, contactScene, safeUrl };
+  window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, capabilityReveal, aiStatement, resourceLinks, educationSection, lifeSection, contacts, contactScene, safeUrl };
 })();

@@ -53,13 +53,15 @@
   function createEnglish(document) {
     const draft = standalone(document, 'zh');
     const exact = {
-      '工作经历': 'Experience', '作品集': 'Capabilities', '能力': 'Capabilities', 'AI 应用': 'AI Applications',
+      '工作经历': 'Experience', '过往经历': 'Past Experience', '作品集': 'Capabilities', '能力': 'Capabilities', 'AI 应用': 'AI Applications',
       '生活里的片段': 'Life', '教育经历': 'Education',
       '一起做点\n值得被记住的事。': 'Let’s make something\nworth remembering.',
       '达人 · SEO · AI': 'Influencers · SEO · AI',
       '公司 / 职位 / 行业': 'Company / Role / Industry',
       '案例、内容与合作。': 'Projects, content and collaborations.',
       'BD / 内容生产 / CMS': 'Outreach / Content / CMS',
+      '拥抱 AI，拥抱世界。\nAI 帮助我打开工作的新世界。': 'Embrace AI, embrace the world.\nAI opens a new world of work for me.',
+      '探索世界中': 'Exploring the world', '西南财经大学硕士': 'SWUFE · Master’s',
       '工作与实习': 'Work & Internships', '达人营销': 'Influencer Marketing',
       '社媒运营': 'Social Media', 'SEO运营': 'SEO', '业务工作流': 'AI Workflows',
       '相册': 'Photos', '日常记录': 'Notes', '保持联系': 'Stay in Touch'
@@ -74,8 +76,14 @@
       if (Object.hasOwn(dictionaries.en, key)) page.name = dictionaries.en[key];
       page.title = translate(page.title);
       page.subtitle = translate(page.subtitle);
+      if (page.id === 'home') ['statusText', 'portraitFooterLeft', 'portraitFooterRight'].forEach(key => {
+        if (Object.hasOwn(page, key)) page[key] = translate(page[key]);
+      });
       (page.sections || []).forEach(section => {
         section.title = translate(section.title);
+        if (page.id === 'ai' && section.id === 'ai-resources') (section.items || []).forEach(item => {
+          if (item.id === 'github' && item.text === '代码与实验') item.text = 'Code & experiments';
+        });
         if (page.id === 'contact') (section.items || []).forEach(item => {
           const names = { phone: 'Phone', email: 'Email', wechat: 'WeChat', resume: 'Resume' };
           if (names[item.id]) item.title = names[item.id];

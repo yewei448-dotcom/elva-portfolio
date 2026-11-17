@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const STORAGE_KEY = 'yewei.visualDraft.v1';
-  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforeCapabilitiesRefresh.v4';
+  const BACKUP_STORAGE_KEY = 'yewei.visualDraft.beforePresentationRefresh.v5';
   const KINDS = { text: '文字介绍', photo: '照片相册', links: '账号与链接', companies: '公司经历', videos: '视频作品', workflow: 'AI 工作流', capability: '作品 / 案例分类' };
   const PAGE_LABELS = { home: '首页', education: '学历', experience: '经历', capability: '能力', ai: 'AI应用', contact: '联系', building: '作品', life: '生活' };
   const MAX_JSON_BYTES = 48 * 1024 * 1024;
@@ -56,7 +56,8 @@
     els.status.dataset.state = state;
     els.status.title = message;
   }
-  function currentPage() { return draft.pages.find(page => page.id === pageId) || draft.pages[0]; }
+  function visiblePages() { return draft.pages.filter(page => !page.archived); }
+  function currentPage() { return visiblePages().find(page => page.id === pageId) || visiblePages()[0]; }
   function currentSection() { return currentPage().sections.find(section => section.id === selectedSectionId); }
   function selectInitialSection() {
     const page = currentPage();
@@ -100,7 +101,7 @@
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
     if (value.structureVersion !== undefined) {
-      if (![1, 2, 3, 4, 5].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
+      if (![1, 2, 3, 4, 5, 6].includes(value.structureVersion)) throw new Error('编辑稿的页面结构版本暂不支持。');
       normalized.structureVersion = value.structureVersion;
     }
     for (const key of ['name', 'tagline', 'phone', 'email', 'wechat']) normalized.site[key] = requireString(value.site[key], '网站基本信息', key === 'tagline' ? 2000 : 500);
@@ -123,6 +124,13 @@
         subtitle: requireString(page.subtitle, '页面副标题', 5000),
         background: { color, image: bgImage, overlay: Number.isFinite(Number(bg.overlay)) ? Math.min(0.85, Math.max(0, Number(bg.overlay))) : 0.2 }, sections: []
       };
+      if (page.archived !== undefined) {
+        if (typeof page.archived !== 'boolean') throw new Error('页面归档标记必须为 true 或 false。');
+        np.archived = page.archived;
+      }
+      if (pid === 'home') ['statusText', 'portraitFooterLeft', 'portraitFooterRight'].forEach(key => {
+        np[key] = requireString(page[key], '首页展示文字', 2000);
+      });
       if (pid === 'home' || Object.prototype.hasOwnProperty.call(page, 'portraitImage')) {
         const portraitImage = requireString(page.portraitImage, '悬挂照片', 12 * 1024 * 1024);
         if (!safeUrl(portraitImage, true)) throw new Error('悬挂照片包含不支持的图片地址。');
@@ -175,6 +183,7 @@
       }
       normalized.pages.push(np);
     }
+    if (!normalized.pages.some(page => !page.archived)) throw new Error('编辑稿需要至少一个未归档页面。');
     return normalized;
   }
 
@@ -216,7 +225,7 @@
   }
   function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeout(pushPreview, 120); }
   function backupLegacyDraft(raw, value) {
-    if (!raw || value?.structureVersion === 5) return;
+    if (!raw || value?.structureVersion === 6) return;
     legacyBackupRaw = raw;
     try {
       if (localStorage.getItem(BACKUP_STORAGE_KEY) === null) localStorage.setItem(BACKUP_STORAGE_KEY, raw);
@@ -354,7 +363,7 @@
 
   function renderTabs() {
     els.tabs.replaceChildren();
-    draft.pages.forEach(page => {
+    visiblePages().forEach(page => {
       const tab = button(page.name || PAGE_LABELS[page.id] || '页面', 'page-tab', () => selectPage(page.id));
       tab.dataset.pageId = page.id; tab.setAttribute('aria-pressed', String(page.id === pageId));
       if (page.id === pageId) tab.classList.add('selected');
@@ -458,6 +467,11 @@
     });
     els.settings.append(pageGroup.details, background.details);
     if (page.id === 'home') {
+      const presentation = group('首页展示文字', '状态与悬挂照片底部文字', true);
+      [['statusText', '状态文字'], ['portraitFooterLeft', '照片左下文字'], ['portraitFooterRight', '照片右下文字']].forEach(([key, label]) => {
+        presentation.body.append(field(label, page[key], value => { page[key] = value; changed(); }));
+      });
+      els.settings.append(presentation.details);
       const avatar = group('首页头像', page.avatarImage ? 'AI 形象 · 可替换' : '已隐藏，可重新上传', true);
       avatar.body.append(imageControl(page.avatarImage || '', value => {
         const target = draft.pages.find(p => p.id === page.id); if (!target) return;
@@ -682,7 +696,7 @@
     if (scroll) scrollToInspector();
   }
   function selectPage(nextPageId) {
-    if (!draft.pages.some(page => page.id === nextPageId)) return;
+    if (!visiblePages().some(page => page.id === nextPageId)) return;
     pageId = nextPageId; selectedSectionId = ''; addPickerOpen = false; selectInitialSection(); render();
     $('.editor-scroll').scrollTop = 0; pushPreview();
   }
@@ -779,7 +793,7 @@
       if (event.data.pageId !== pageId) selectPage(event.data.pageId);
     }
     if (event.data.type === 'yewei-draft:select' && typeof event.data.sectionId === 'string') {
-      if (typeof event.data.pageId === 'string' && event.data.pageId !== pageId && draft.pages.some(p => p.id === event.data.pageId)) { pageId = event.data.pageId; render(); }
+      if (typeof event.data.pageId === 'string' && event.data.pageId !== pageId && visiblePages().some(p => p.id === event.data.pageId)) { pageId = event.data.pageId; render(); }
       selectSection(event.data.sectionId, true);
     }
   });

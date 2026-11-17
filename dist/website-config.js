@@ -1,7 +1,7 @@
-// 能力案例与双语稿；历史默认字段精确更新，自定义内容与旧链接保留。
+// 当前展示文字；归档页面与双语原稿继续保留以支持历史迁移和恢复。
 window.websiteDefaults = {
   "schemaVersion": 1,
-  "structureVersion": 5,
+  "structureVersion": 6,
   "site": {
     "name": "叶薇",
     "tagline": "达人 · SEO · AI",
@@ -22,12 +22,15 @@ window.websiteDefaults = {
         "overlay": 0.22
       },
       "sections": [],
-      "avatarImage": "assets/elva-ai-avatar.png"
+      "avatarImage": "assets/elva-ai-avatar.png",
+      "statusText": "探索世界中",
+      "portraitFooterLeft": "西南财经大学硕士",
+      "portraitFooterRight": "ENTP"
     },
     {
       "id": "experience",
       "name": "经历",
-      "title": "工作经历",
+      "title": "过往经历",
       "subtitle": "公司 / 职位 / 行业",
       "background": {
         "color": "#fbfaf5",
@@ -75,7 +78,7 @@ window.websiteDefaults = {
               "text": "抖音 KOC 合作、场景创意验证与创作者招募。",
               "url": "",
               "image": "assets/logos/insta360.svg",
-              "meta": "2025.11 起 · Flow 产品线市场营销",
+              "meta": "2025.11 起 · Flow 产品线市场营销实习生",
               "details": "自主建联抖音 KOC，提炼 AI 追踪、盗梦空间等产品卖点。\n输出 20 份 Brief 与内容 SOP，主导 Flow2 创作者招募。",
               "steps": [],
               "metrics": [
@@ -93,7 +96,7 @@ window.websiteDefaults = {
                 }
               ],
               "links": [],
-              "role": "Flow 产品线市场营销",
+              "role": "Flow 产品线市场营销实习生",
               "industry": "消费电子 / 影像",
               "period": "2025.11 起"
             },
@@ -103,7 +106,7 @@ window.websiteDefaults = {
               "text": "奥地利 Instagram 官号启动、内容本地化与投放跟进。",
               "url": "",
               "image": "assets/logos/oppo.svg",
-              "meta": "2025.07 — 2025.11 · 海外数字营销",
+              "meta": "2025.07 — 2025.11 · 海外数字营销实习生",
               "details": "制定内容排期，完成素材本地化并对接 KOC、KOL。\n跟进 TikTok、Meta 投放表现，访谈 20+ 位当地核心用户。",
               "steps": [],
               "metrics": [
@@ -121,7 +124,7 @@ window.websiteDefaults = {
                 }
               ],
               "links": [],
-              "role": "海外数字营销",
+              "role": "海外数字营销实习生",
               "industry": "消费电子 / 手机",
               "period": "2025.07 — 2025.11"
             },
@@ -159,7 +162,7 @@ window.websiteDefaults = {
               "text": "从 0 到 1 运营 TikTok 官号，制作 AI 特效内容。",
               "url": "",
               "image": "",
-              "meta": "2024.12 — 2025.03 · 海外 AI 产品运营",
+              "meta": "2024.12 — 2025.03 · 海外 AI 产品运营实习生",
               "details": "结合热点与竞品研究制作原生 AI 特效视频，沉淀内容模板与 SOP。\n收集用户反馈，协同团队落地 2 项功能优化；投流后一周粉丝破万。",
               "steps": [],
               "metrics": [
@@ -177,7 +180,7 @@ window.websiteDefaults = {
                 }
               ],
               "links": [],
-              "role": "海外 AI 产品运营",
+              "role": "海外 AI 产品运营实习生",
               "industry": "游戏 / AI 应用",
               "period": "2024.12 — 2025.03"
             }
@@ -405,7 +408,7 @@ window.websiteDefaults = {
       "id": "ai",
       "name": "AI 应用",
       "title": "AI 应用",
-      "subtitle": "BD / 内容生产 / CMS",
+      "subtitle": "拥抱 AI，拥抱世界。\nAI 帮助我打开工作的新世界。",
       "background": {
         "color": "#fbfaf5",
         "image": "",
@@ -516,6 +519,31 @@ window.websiteDefaults = {
               ]
             }
           ]
+        },
+        {
+          "id": "ai-resources",
+          "kind": "links",
+          "title": "",
+          "subtitle": "",
+          "items": [
+            {
+              "id": "github",
+              "title": "GitHub",
+              "text": "代码与实验",
+              "url": "https://github.com/repos",
+              "image": "",
+              "meta": "",
+              "details": "",
+              "steps": [],
+              "metrics": [],
+              "links": [
+                {
+                  "label": "GitHub",
+                  "url": "https://github.com/repos"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -606,7 +634,8 @@ window.websiteDefaults = {
             }
           ]
         }
-      ]
+      ],
+      "archived": true
     },
     {
       "id": "education",
@@ -639,7 +668,8 @@ window.websiteDefaults = {
             }
           ]
         }
-      ]
+      ],
+      "archived": true
     },
     {
       "id": "contact",
@@ -1075,7 +1105,7 @@ function migrateWebsiteDraftV4(value,{language='zh'}={}) {
 
 
 // v5 更新能力案例和封面，不覆盖中文或英文的自写字段。
-window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{language='zh'}={}) {
+function migrateWebsiteDraftV5(value,{language='zh'}={}) {
   if(!value||value.schemaVersion!==1||!Array.isArray(value.pages))return value;
   if(Number(value.structureVersion)>=5)return value;
   const clone=object=>JSON.parse(JSON.stringify(object));
@@ -1310,6 +1340,53 @@ window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{lan
         item.links=links;
       }
     }
+  }
+  const english=next.localizations?.en;
+  if(english&&typeof english==='object'&&!Array.isArray(english)&&!own(english,'localizations'))next.localizations.en=migrateWebsiteDraftPhotos(english,{language:'en'});
+  return next;
+};
+
+
+// v6 更新首页文字、实习职位与 AI 资源；生活/学历归档，不丢用户内容。
+window.migrateWebsiteDraftPhotos = function migrateWebsiteDraftPhotos(value,{language='zh'}={}){
+  if(!value||value.schemaVersion!==1||!Array.isArray(value.pages))return value;
+  if(Number(value.structureVersion)>=6)return value;
+  const clone=object=>JSON.parse(JSON.stringify(object)),own=(object,key)=>Object.prototype.hasOwnProperty.call(object,key);
+  const next=clone(migrateWebsiteDraftV5(value,{language}));next.structureVersion=6;
+  const standards=window.websiteDefaults;
+  const home=next.pages.find(page=>page.id==='home');
+  const localized=language==='en'
+    ? {statusText:'Exploring the world',portraitFooterLeft:'SWUFE · Master’s',portraitFooterRight:'ENTP'}
+    : {statusText:'探索世界中',portraitFooterLeft:'西南财经大学硕士',portraitFooterRight:'ENTP'};
+  if(home){
+    const old={statusText:['叶薇的个人空间',"Elva's space","叶薇's space"],portraitFooterLeft:['CONTENT / GROWTH / AI','PERSONAL SPACE'],portraitFooterRight:[]};
+    for(const key of Object.keys(localized))if(!own(home,key)||(old[key]||[]).includes(home[key]))home[key]=localized[key];
+  }
+  const experience=next.pages.find(page=>page.id==='experience');
+  if(experience){
+    if(!own(experience,'title')||experience.title===(language==='en'?'Experience':'工作经历'))experience.title=language==='en'?'Past Experience':'过往经历';
+    const roleChanges={insta360:['Flow 产品线市场营销','Flow 产品线市场营销实习生'],oppo:['海外数字营销','海外数字营销实习生'],guru:['海外 AI 产品运营','海外 AI 产品运营实习生']};
+    const originalPeriods={insta360:'2025.11 起',oppo:'2025.07 — 2025.11',guru:'2024.12 — 2025.03'};
+    for(const item of (experience.sections||[]).flatMap(section=>section.items||[])){
+      const change=roleChanges[item.id];if(!change)continue;
+      const [oldRole,newRole]=change;
+      if(!own(item,'role')||item.role===oldRole)item.role=newRole;
+      const previousMetas=[originalPeriods[item.id]+' · '+oldRole,item.period+' · '+oldRole];
+      if(previousMetas.includes(item.meta))item.meta=item.meta.slice(0,-oldRole.length)+newRole;
+    }
+  }
+  for(const page of next.pages)if(['life','education'].includes(page.id))page.archived=true;
+  const ai=next.pages.find(page=>page.id==='ai'),aiDefault=standards.pages.find(page=>page.id==='ai');
+  if(ai){
+    const oldSubtitles=['BD / 内容生产 / CMS','把重复工作整理成可以复用的流程。'];
+    if(language==='en')oldSubtitles.push('Outreach / Content / CMS');
+    if(!own(ai,'subtitle')||oldSubtitles.includes(ai.subtitle))ai.subtitle=language==='en'?'Embrace AI, embrace the world.\nAI opens a new world of work for me.':aiDefault.subtitle;
+    const sectionDefault=clone(aiDefault.sections.find(section=>section.id==='ai-resources'));
+    if(language==='en')sectionDefault.items[0].text='Code & experiments';
+    ai.sections=Array.isArray(ai.sections)?ai.sections:[];
+    const section=ai.sections.find(section=>section.id==='ai-resources');
+    if(!section)ai.sections.push(sectionDefault);
+    else if(Array.isArray(section.items)&&!section.items.some(item=>item.id==='github'))section.items.push(sectionDefault.items[0]);
   }
   const english=next.localizations?.en;
   if(english&&typeof english==='object'&&!Array.isArray(english)&&!own(english,'localizations'))next.localizations.en=migrateWebsiteDraftPhotos(english,{language:'en'});

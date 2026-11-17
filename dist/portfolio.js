@@ -12,21 +12,11 @@
     return node;
   };
   const main = document.querySelector('#portfolio-main');
-  function journalBlock(section, index, renderItems) {
-    const block = el('section', 'journal-block'); block.id = section.id;
-    if (section.title || section.subtitle) {
-      const heading = el('header', 'work-category-heading');
-      heading.append(el('span', 'portfolio-kicker', String(index + 1).padStart(2, '0')), el('h3', '', section.title || ''));
-      if (section.subtitle) heading.append(el('p', '', section.subtitle));
-      block.append(heading);
-    }
-    block.append(renderItems(section)); return block;
-  }
-  const pages = ['experience', 'capability', 'ai', 'life', 'education', 'contact'];
-  const labels = ['EXPERIENCE', 'CAPABILITIES', 'AI APPLICATIONS', 'LIFE', 'EDUCATION', 'CONTACT'];
+  const pages = ['experience', 'capability', 'ai', 'contact'];
+  const labels = ['PAST EXPERIENCE', 'CAPABILITIES', 'AI APPLICATIONS', 'CONTACT'];
   pages.forEach((id, i) => {
     const page = draft.pages.find(x => x.id === id);
-    if (!page) return;
+    if (!page || page.archived) return;
     const section = el('section', `portfolio-section section paper portfolio-${id}`); section.id = id;
     const shell = el('div', 'section-shell');
     if (id === 'contact') {
@@ -37,18 +27,15 @@
       section.classList.toggle('has-photo', Boolean(image));
       section.style.backgroundColor = /^#[0-9a-f]{3,8}$/i.test(bg.color || '') ? bg.color : '#7094ac';
       section.style.backgroundImage = image ? `linear-gradient(rgba(18,27,23,${overlay}),rgba(18,27,23,${Math.min(.8, overlay + .1)})),url(${JSON.stringify(image)})` : 'none';
-      const educationName = draft.pages.find(page => page.id === 'education')?.sections?.flatMap(section => section.items || [])[0]?.title;
-      shell.append(ui.contactScene(page, draft.site, { educationName })); section.append(shell); main.append(section); return;
+      shell.append(ui.contactScene(page, draft.site)); section.append(shell); main.append(section); return;
     }
     const heading = el('header', 'portfolio-heading');
     const title = el('div');
     title.append(el('span', 'portfolio-kicker', `${String(i + 1).padStart(2, '0')} / ${labels[i]}`), el('h2', '', page.title));
     heading.append(title);
-    if (page.subtitle) heading.append(el('p', '', page.subtitle));
+    if (page.subtitle && id !== 'ai') heading.append(el('p', '', page.subtitle));
     shell.append(heading);
-    if (id === 'education') {
-      page.sections.forEach((s, index) => shell.append(journalBlock(s, index, ui.educationSection)));
-    } else if (id === 'experience') {
+    if (id === 'experience') {
       const grid = el('div', 'experience-grid');
       page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.companyCard(item, index)));
       shell.append(grid);
@@ -57,15 +44,16 @@
       const edit = el('a', 'section-edit-link', copy('编辑能力案例 ↗', 'Edit capability cases ↗')); edit.href = `editor.html?page=capability&lang=${language}`; tools.append(edit); shell.append(tools);
       const list = el('div', 'portfolio-gallery');
       page.sections.forEach((s, index) => list.append(ui.portfolioSection(s, index)));
-      shell.append(list);
+      shell.append(ui.capabilityReveal(list));
     } else if (id === 'ai') {
-      const grid = el('div', 'workbench-grid');
-      page.sections.flatMap(x => x.items || []).forEach((item, index) => grid.append(ui.workflow(item, index)));
-      shell.append(grid);
-    } else if (id === 'life') {
-      const tools = el('div', 'portfolio-tools');
-      const edit = el('a', 'section-edit-link', copy('编辑生活页 ↗', 'Edit life ↗')); edit.href = `editor.html?page=life&lang=${language}`; tools.append(edit); shell.append(tools);
-      page.sections.forEach((s, index) => shell.append(journalBlock(s, index, ui.lifeSection)));
+      if (page.subtitle) shell.append(ui.aiStatement(page.subtitle));
+      page.sections.forEach((section, sectionIndex) => {
+        if (section.kind === 'links') { shell.append(ui.resourceLinks(section)); return; }
+        if (section.kind !== 'workflow') { shell.append(ui.portfolioSection(section, sectionIndex)); return; }
+        const grid = el('div', 'workbench-grid');
+        (section.items || []).forEach((item, index) => grid.append(ui.workflow(item, index)));
+        shell.append(grid);
+      });
     }
     section.append(shell); main.append(section);
   });
@@ -86,15 +74,17 @@
     window.WebsiteLanguage?.setLanguage(next);
     const url = new URL(location.href); url.searchParams.set('lang', next); history.replaceState(null, '', url); location.reload();
   });
-  document.querySelector('.hero-status > span:last-child').textContent = copy(`${draft.site.name}的个人空间`, `${draft.site.name}'s space`);
+  document.querySelector('.hero-status > span:last-child').textContent = home?.statusText ?? copy('探索世界中', 'Exploring the world');
+  document.querySelector('.id-bottom > span:first-child').textContent = home?.portraitFooterLeft ?? copy('西南财经大学硕士', 'SWUFE · Master’s');
+  document.querySelector('.id-bottom > span:last-child').textContent = home?.portraitFooterRight ?? 'ENTP';
   document.querySelector('.hero-button').firstChild.textContent = copy('往下逛逛 ', 'Explore ');
-  document.querySelector('.hero-foot > span').textContent = home?.subtitle || draft.site.tagline;
+  document.querySelector('.hero-foot > span').textContent = home?.subtitle ?? draft.site.tagline ?? '';
   document.querySelector('.skip-link').textContent = copy('跳到主要内容', 'Skip to content');
   document.querySelector('.desktop-nav').setAttribute('aria-label', copy('主导航', 'Main navigation'));
   document.querySelector('.logo').setAttribute('aria-label', copy('Elva 首页', 'Elva home'));
   document.querySelector('#portrait-card > img').alt = copy('Elva 在户外的个人照片', 'Elva outdoors');
-  if (home?.subtitle) document.querySelector('.hero-intro').textContent = home.subtitle;
-  if (home?.title) {
+  if (typeof home?.subtitle === 'string') document.querySelector('.hero-intro').textContent = home.subtitle;
+  if (typeof home?.title === 'string') {
     const heading = document.querySelector('.hero h1');
     const [name, ...motto] = home.title.split('\n');
     heading.replaceChildren(el('span', 'hero-name', name));
@@ -139,7 +129,7 @@
     }), { rootMargin: '-15% 0px -45% 0px' });
     main.querySelectorAll(':scope > section').forEach(s => observer.observe(s));
   }
-  const legacy = { about: 'experience', accounts: 'capability', photos: 'capability', projects: 'ai' };
+  const legacy = { about: 'experience', accounts: 'capability', photos: 'capability', projects: 'ai', life: 'contact', education: 'contact' };
   const hash = location.hash.slice(1); const target = legacy[hash] || hash;
   if (target && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
   function scrollToInitialSection() { requestAnimationFrame(() => {
