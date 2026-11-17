@@ -12,7 +12,7 @@
       'ui.copyWechat': '复制微信号', 'ui.copied': '微信号已复制', 'ui.email': '邮件',
       'ui.phone': '电话', 'ui.wechat': '微信', 'ui.resume': '简历',
       'editor.language': '编辑语言', 'editor.preview': '实时预览',
-      'editor.seedHint': 'English 初稿已提供英文导航和标题，作品描述沿用中文，方便你自行翻译。两种语言独立保存。'
+      'editor.seedHint': 'English 初稿已完整本地化，两种语言可独立编辑与保存。'
     },
     en: {
       'nav.home': 'Home', 'nav.experience': 'Experience', 'nav.capability': 'Capabilities',
@@ -21,7 +21,7 @@
       'ui.copyWechat': 'Copy WeChat ID', 'ui.copied': 'WeChat ID copied', 'ui.email': 'Email',
       'ui.phone': 'Phone', 'ui.wechat': 'WeChat', 'ui.resume': 'Resume',
       'editor.language': 'Editing language', 'editor.preview': 'Live preview',
-      'editor.seedHint': 'Navigation and headings are in English. Project descriptions start with the Chinese text for you to translate. Both languages are saved separately.'
+      'editor.seedHint': 'The English draft is fully localized. Both languages can be edited and saved independently.'
     }
   };
   let language = 'zh';
@@ -50,8 +50,21 @@
       ? window.migrateWebsiteDraftPhotos(result, { language: selectedLanguage })
       : result;
   }
+  // Translate only known seed copy. Keep custom text, links, assets and IDs intact.
+  function localizeEnglish(document) {
+    const exact = window.websiteEnglishText || {};
+    const textKeys = new Set(['name', 'tagline', 'title', 'subtitle', 'text', 'meta', 'details', 'role', 'industry', 'period', 'statusText', 'portraitFooterLeft', 'portraitFooterRight', 'value', 'label']);
+    const translate = value => Object.hasOwn(exact, value) ? exact[value] : value.split(/(\n\s*\n)/).map(part => Object.hasOwn(exact, part) ? exact[part] : part).join('');
+    function visit(value, key = '') {
+      if (typeof value === 'string') return textKeys.has(key) || key === 'steps' ? translate(value) : value;
+      if (Array.isArray(value)) return value.map(item => visit(item, key));
+      if (object(value)) return Object.fromEntries(Object.entries(value).map(([childKey, child]) => [childKey, visit(child, childKey)]));
+      return value;
+    }
+    return visit(document);
+  }
   function createEnglish(document) {
-    const draft = standalone(document, 'zh');
+    const draft = localizeEnglish(standalone(document, 'zh'));
     const exact = {
       '工作经历': 'Experience', '过往经历': 'Past Experience', '作品集': 'Capabilities', '能力': 'Capabilities', 'AI 应用': 'AI Applications',
       '生活里的片段': 'Life', '教育经历': 'Education',
@@ -104,7 +117,7 @@
       ? object(document.localizations?.en) ? standalone(document.localizations.en, 'en') : createEnglish(document)
       : standalone(document, 'zh');
     delete result.localizations;
-    return result;
+    return selected === 'en' ? localizeEnglish(result) : result;
   }
-  window.WebsiteLanguage = { getLanguage, setLanguage, resolve, createEnglish, t };
+  window.WebsiteLanguage = { getLanguage, setLanguage, resolve, createEnglish, localizeEnglish, t };
 })();

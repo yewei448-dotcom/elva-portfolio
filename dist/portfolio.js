@@ -76,8 +76,13 @@
   document.querySelector('.id-bottom > span:last-child').textContent = home?.portraitFooterRight ?? 'ENTP';
   document.querySelector('.skip-link').textContent = copy('跳到主要内容', 'Skip to content');
   document.querySelector('.desktop-nav').setAttribute('aria-label', copy('主导航', 'Main navigation'));
+  document.querySelector('#mobile-menu').setAttribute('aria-label', copy('展开导航', 'Mobile navigation'));
+  document.querySelector('.ios-dock').setAttribute('aria-label', copy('快捷导航', 'Quick navigation'));
   document.querySelector('.logo').setAttribute('aria-label', copy('Elva 首页', 'Elva home'));
   document.querySelector('#portrait-card > img').alt = copy('Elva 在户外的个人照片', 'Elva outdoors');
+  document.querySelector('.hero-status img').alt = copy('齐刘海的 Elva AI 插画头像', 'Elva’s AI avatar with straight bangs');
+  document.querySelector('.id-card-caption strong').textContent = copy('叶薇', 'Ye Wei');
+  document.querySelector('meta[name="description"]').content = copy('Elva 叶薇：过往经历、达人与 SEO 能力，以及 AI 应用。', 'Elva (Ye Wei): experience, influencer marketing, social media, SEO and AI workflows.');
   if (typeof home?.subtitle === 'string') document.querySelector('.hero-intro').textContent = home.subtitle;
   if (typeof home?.title === 'string') {
     const heading = document.querySelector('.hero h1');
@@ -94,10 +99,11 @@
   else { document.querySelector('.hanging-photo').hidden = true; document.querySelector('.mobile-cord').hidden = true; }
   const menuButton = document.querySelector('.menu-toggle');
   const menu = document.querySelector('#mobile-menu');
-  function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', '打开菜单'); }
+  menuButton.setAttribute('aria-label', copy('打开菜单', 'Open menu'));
+  function closeMenu() { menu.hidden = true; menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', copy('打开菜单', 'Open menu')); }
   menuButton.addEventListener('click', () => {
     const open = menu.hidden; menu.hidden = !open;
-    menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+    menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? copy('关闭菜单', 'Close menu') : copy('打开菜单', 'Open menu'));
   });
   menu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });

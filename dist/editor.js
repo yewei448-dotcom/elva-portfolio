@@ -97,6 +97,7 @@
   }
   function normalizeSingleDraft(value, language = 'zh') {
     if (typeof window.migrateWebsiteDraftPhotos === 'function') value = window.migrateWebsiteDraftPhotos(value, { language });
+    if (language === 'en') value = languageApi.localizeEnglish(value);
     if (!value || typeof value !== 'object' || Array.isArray(value) || value.schemaVersion !== 1 || !value.site || typeof value.site !== 'object' || Array.isArray(value.site)) throw new Error('这不是受支持的网站编辑稿（需要 schemaVersion: 1）。');
     if (!Array.isArray(value.pages) || value.pages.length < 1 || value.pages.length > 12) throw new Error('编辑稿需要包含 1–12 个页面。');
     const normalized = { schemaVersion: 1, site: {}, pages: [] };
@@ -704,7 +705,7 @@
     selectInitialSection(); renderTabs(); renderPageSettings(); renderSectionList(); renderAddPicker(); renderSectionEditor();
     if (els.language) els.language.value = editingLanguage;
     if (els.languageHint) els.languageHint.textContent = editingLanguage === 'en'
-      ? 'English 初稿已提供英文导航和标题；作品描述以中文为底稿，供你自行翻译。这里的修改只影响 English。'
+      ? 'English 初稿已完整本地化。这里的修改只影响 English，已有的自写英文会保留。'
       : '正在编辑中文内容，English 单独保留。保存与导出会包含中英文完整编辑稿。';
     els.label.textContent = `${currentPage().name || PAGE_LABELS[pageId] || '当前页面'} · 实时预览`;
   }

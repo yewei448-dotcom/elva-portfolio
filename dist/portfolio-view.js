@@ -35,6 +35,7 @@
   }
   function image(src, alt, cls) {
     const img = el('img', cls);
+    if (window.WebsiteLanguage?.getLanguage() === 'en' && src === 'assets/platforms/douyin-cover.svg') src = 'assets/platforms/douyin-cover-en.svg';
     img.src = src; img.alt = alt; img.loading = 'lazy';
     img.addEventListener('error', () => {
       img.hidden = true;
@@ -92,10 +93,10 @@
     top.append(el('span', '', item.period || item.meta || ''), el('span', 'fold-plus', '+'));
     const logo = el('span', 'xp-logo');
     const src = safeUrl(item.image, true);
-    if (src) logo.append(image(src, item.title || '公司', 'company-logo'));
-    else logo.append(el('span', 'logo-fallback', item.title || '公司'));
+    if (src) logo.append(image(src, item.title || textFor('公司', 'Company'), 'company-logo'));
+    else logo.append(el('span', 'logo-fallback', item.title || textFor('公司', 'Company')));
     const identity = el('span', 'xp-identity');
-    identity.append(el('strong', '', item.title || '公司'), el('span', 'xp-role', item.role || item.text || ''));
+    identity.append(el('strong', '', item.title || textFor('公司', 'Company')), el('span', 'xp-role', item.role || item.text || ''));
     const industry = el('span', 'xp-industry', item.industry || '');
     summary.append(top, logo, identity, industry);
     const detail = el('div', 'xp-detail');
@@ -108,13 +109,13 @@
     const card = el('article', 'social-account');
     const url = safeUrl(item.url) || uniqueLinks(item)[0]?.url;
     const head = url ? link(url, '', 'social-account-link') : el('div', 'social-account-link');
-    const platform = /xiaohongshu/i.test(url || '') ? '小红书' : 'TikTok';
+    const platform = /xiaohongshu/i.test(url || '') ? textFor('小红书', 'RedNote') : 'TikTok';
     const platformRow = el('span', 'social-platform');
     platformRow.append(el('span', '', platform), el('span', '', '↗'));
     head.append(platformRow, el('strong', '', item.title), el('span', 'social-meta', item.meta || item.text || ''));
     card.append(head);
     if (item.details) {
-      const fold = el('details', 'social-note'); fold.append(el('summary', '', '运营内容 +'), paragraphs(item.details)); card.append(fold);
+      const fold = el('details', 'social-note'); fold.append(el('summary', '', textFor('运营内容 +', 'Account management +')), paragraphs(item.details)); card.append(fold);
     }
     return card;
   }
@@ -123,7 +124,7 @@
     const summary = el('summary');
     const copy = el('span', 'branch-summary-copy');
     if (item.meta) copy.append(el('span', 'branch-meta', item.meta));
-    copy.append(el('strong', '', item.title || '案例'));
+    copy.append(el('strong', '', item.title || textFor('案例', 'Case study')));
     summary.append(el('span', 'branch-index', String(index + 1).padStart(2, '0')), copy, el('span', 'fold-plus', '+'));
     const body = el('div', 'branch-body');
     if (item.text) body.append(el('p', 'branch-intro', item.text));
@@ -141,7 +142,7 @@
     const root = el('details', 'capability-root'); root.id = section.id;
     const summary = el('summary', 'capability-summary');
     const titleRow = el('span', 'capability-title-row');
-    titleRow.append(el('h3', '', section.title || '能力'), el('span', 'capability-arrow', '↗'));
+    titleRow.append(el('h3', '', section.title || textFor('能力', 'Capabilities')), el('span', 'capability-arrow', '↗'));
     summary.append(titleRow);
     if (section.subtitle) summary.append(el('span', 'capability-deck', section.subtitle));
     const preview = el('span', 'capability-preview'); preview.setAttribute('aria-hidden', 'true');
@@ -189,7 +190,7 @@
     const summary = el('summary', 'piece-summary');
     const cover = el('span', 'piece-cover');
     const src = safeUrl(item.image, true);
-    if (src) cover.append(image(src, item.title || '作品封面', 'piece-image'));
+    if (src) cover.append(image(src, item.title || textFor('作品封面', 'Project cover'), 'piece-image'));
     else {
       const placeholder = el('span', 'piece-placeholder');
       placeholder.append(el('span', '', String(index + 1).padStart(2, '0')), el('small', '', textFor('封面待补充', 'Add a cover')));
@@ -200,7 +201,7 @@
     copy.append(el('h4', '', item.title || textFor('新作品', 'New work')));
     if (item.text) copy.append(el('span', 'piece-description', item.text));
     const highlight = item.metrics?.find(metric => metric.value);
-    if (highlight) copy.append(el('span', 'piece-highlight', `${highlight.value} · ${highlight.label || '项目成果'}`));
+    if (highlight) copy.append(el('span', 'piece-highlight', `${highlight.value} · ${highlight.label || textFor('项目成果', 'Results')}`));
     const action = el('span', 'piece-action', textFor('查看案例 +', 'View case +')); copy.append(action);
     summary.append(cover, copy);
     const body = el('div', 'piece-body');
@@ -212,14 +213,16 @@
     const proofs = uniqueLinks(item);
     const links = el('div', 'proof-links');
     const groupedLinks = new Map();
+    const groupKeys = { '云台原创': 'gimbal', 'Original gimbal': 'gimbal', '百万播放': 'million', 'Million views': 'million', 'Mic': 'mic' };
     const groupTitles = {
-      '云台原创': textFor('云台 · 原创模板', 'Gimbal · Original templates'),
-      '百万播放': textFor('云台 · 百万播放案例', 'Gimbal · Million-view videos'),
-      'Mic': textFor('Mic · 达人合作', 'Mic · Creator collaboration')
+      gimbal: textFor('云台 · 原创模板', 'Gimbal · Original templates'),
+      million: textFor('云台 · 百万播放案例', 'Gimbal · Million-view videos'),
+      mic: textFor('Mic · 达人合作', 'Mic · Creator collaboration')
     };
     proofs.forEach(proof => {
       const separator = proof.label.indexOf('｜');
-      const group = separator >= 0 ? proof.label.slice(0, separator) : '';
+      const prefix = separator >= 0 ? proof.label.slice(0, separator) : '';
+      const group = groupKeys[prefix];
       if (!Object.hasOwn(groupTitles, group)) { links.append(link(proof.url, `${proof.label} ↗`, 'proof-link')); return; }
       if (!groupedLinks.has(group)) {
         const fold = el('details', 'case-proof-group');
@@ -299,7 +302,7 @@
         const figure = el('figure', 'life-photo');
         const src = safeUrl(item.image, true);
         const frame = el('div', 'life-photo-image');
-        if (src) frame.append(image(src, item.title || '生活照片', 'life-image'));
+        if (src) frame.append(image(src, item.title || textFor('生活照片', 'Life photo'), 'life-image'));
         else {
           const placeholder = link(`editor.html?page=life&section=${encodeURIComponent(section.id)}`, '', 'life-photo-placeholder');
           placeholder.append(el('span', '', '+'), el('small', '', textFor('放一张生活照片', 'Add a photo'))); frame.append(placeholder);
@@ -362,7 +365,7 @@
     const footer = el('footer', 'contact-signature');
     const edit = link('editor.html?page=contact', textFor('编辑 ↗', 'Edit ↗'), 'contact-edit');
     if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
-    footer.append(el('span', '', '叶薇/Elva'), edit, el('span', '', `© ${new Date().getFullYear()}`));
+    footer.append(el('span', '', textFor('叶薇/Elva', 'Ye Wei/Elva')), edit, el('span', '', `© ${new Date().getFullYear()}`));
     scene.append(bar, message, footer); return scene;
   }
   window.PortfolioUI = { companyCard, capability, workflow, portfolioSection, capabilityReveal, aiStatement, resourceLinks, educationSection, lifeSection, contacts, contactScene, safeUrl };
