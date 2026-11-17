@@ -32,26 +32,29 @@
 .contact-scene {
   height: auto;
   min-height: 50svh;
-  padding: 20px 0 108px;
+  padding: 20px 0 92px;
 }
 .contact-scene .contact-topbar { flex: 0 0 auto; gap: 18px; }
 .contact-scene .contact-back { padding: 10px 14px; font-size: 9px; }
 .contact-scene .contact-message {
-  margin-top: auto;
+  margin-top: clamp(18px,2.5svh,32px);
   margin-bottom: 14px;
-  padding-top: 10px;
+  padding-top: 0;
 }
 .contact-scene .contact-message h2 {
-  font-size: clamp(34px,3.6vw,56px);
-  line-height: 1.04;
-  letter-spacing: -.045em;
-  max-width: 22ch;
+  font-size: clamp(54px,min(7.4vw,10svh),120px);
+  line-height: 1.02;
+  letter-spacing: -.055em;
+  max-width: 100%;
+  text-wrap: initial;
 }
+html[lang="en"] .contact-scene .contact-message h2 { line-height: .9; text-transform: uppercase; }
 .contact-scene .contact-signature {
   flex: 0 0 auto;
   gap: 8px 15px;
   font-size: 9px;
   line-height: 1.65;
+  margin-top: auto;
 }
 .contact-scene .education-contact-hint { font-size: 9px; }
 
@@ -173,11 +176,11 @@ body[data-page="contact"] .draft-main.contact-preview-main {
   .contact-scene { min-height: 50svh; padding: 18px 0 max(91px,calc(env(safe-area-inset-bottom) + 78px)); }
   .contact-scene .contact-topbar { gap: 12px; }
   .contact-scene .contact-back { padding: 9px 11px; font-size: 8px; }
-  .contact-scene .contact-message { padding-top: 12px; margin-bottom: 14px; }
+  .contact-scene .contact-message { margin-top: 24px; padding-top: 0; margin-bottom: 18px; }
   .contact-scene .contact-message h2 {
-    font-size: clamp(30px,7.6vw,38px);
-    line-height: 1.09;
-    letter-spacing: -.04em;
+    font-size: clamp(40px,13vw,66px);
+    line-height: 1.02;
+    letter-spacing: -.055em;
     max-width: 100%;
   }
   .contact-scene .contact-signature { gap: 7px 10px; font-size: 8px; }

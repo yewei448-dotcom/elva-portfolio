@@ -68,7 +68,7 @@
     const exact = {
       '工作经历': 'Experience', '过往经历': 'Past Experience', '作品集': 'Capabilities', '能力': 'Capabilities', 'AI 应用': 'AI Applications',
       '生活里的片段': 'Life', '教育经历': 'Education',
-      '一起做点\n值得被记住的事。': 'Let’s make something\nworth remembering.',
+      '一起做点\n值得被记住的事。': 'LET’S BUILD\nSOMETHING\nMEMORABLE.',
       '达人 · SEO · AI': 'Influencers · SEO · AI',
       '公司 / 职位 / 行业': 'Company / Role / Industry',
       '案例、内容与合作。': 'Projects, content and collaborations.',

@@ -361,7 +361,7 @@
     if (options.onHome) back.addEventListener('click', event => { event.preventDefault(); options.onHome(); });
     bar.append(contacts(links, site), back);
     const message = el('div', 'contact-message');
-    message.append(el('h2', '', page.title || textFor('一起做点\n值得被记住的事。', 'Let’s make\nsomething memorable.')));
+    message.append(el('h2', '', page.title || textFor('一起做点\n值得被记住的事。', 'LET’S BUILD\nSOMETHING\nMEMORABLE.')));
     const footer = el('footer', 'contact-signature');
     const edit = link('editor.html?page=contact', textFor('编辑 ↗', 'Edit ↗'), 'contact-edit');
     if (options.onEdit) edit.addEventListener('click', event => { event.preventDefault(); options.onEdit(); });
